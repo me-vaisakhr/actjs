@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — actjs Islands Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 1rem; }
+    header { border-bottom: 1px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem; }
+    .posts { display: grid; gap: 1rem; }
+    .post-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; }
+    .like-btn { background: none; border: 1px solid #ccc; border-radius: 4px; padding: 0.25rem 0.75rem; cursor: pointer; }
+    .like-btn.liked { background: #fee2e2; border-color: #fca5a5; }
+    footer { margin-top: 3rem; border-top: 1px solid #eee; padding-top: 1rem; color: #888; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+  <!--
+    Island Architecture Demo:
+
+    - Header: STATIC island — renders to HTML, ships ZERO JS
+    - Posts: Server-rendered HTML (Django/Laravel/PHP would generate this)
+    - Like buttons: INTERACTIVE islands — each is independent
+    - Below-fold newsletter: VISIBLE island — hydrates when scrolled into view
+  -->
+
+  <!-- Static island: header ships zero JS -->
+  <div id="header"></div>
+
+  <!-- Server-rendered post list (simulated) -->
+  <main>
+    <div class="posts">
+      <div class="post-card">
+        <h2>Getting started with actjs</h2>
+        <p>Learn how to build fast, SSR-first apps with fine-grained signals and island architecture.</p>
+        <div id="like-1"></div>
+      </div>
+      <div class="post-card">
+        <h2>Island architecture explained</h2>
+        <p>Why shipping zero JS for static components is the right default for SEO and performance.</p>
+        <div id="like-2"></div>
+      </div>
+      <div class="post-card">
+        <h2>Signals vs reactive Proxy</h2>
+        <p>Why explicit getter calls beat opaque Proxy magic for predictable, performant reactivity.</p>
+        <div id="like-3"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Lazy island: hydrates only when visible -->
+  <div id="newsletter" style="margin-top: 4rem;"></div>
+
+  <footer>
+    <p>actjs — Lightweight SSR-first frontend library. Zero runtime dependencies.</p>
+  </footer>
+
+  <script type="module" src="./main.tsx"></script>
+</body>
+</html>

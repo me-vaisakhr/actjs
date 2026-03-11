@@ -1,0 +1,53 @@
+/**
+ * actjs/jsx-runtime — React 17+ automatic JSX transform.
+ * Consumers configure:
+ *   "jsx": "react-jsx"
+ *   "jsxImportSource": "actjs"
+ * in their tsconfig. TypeScript then imports jsx/jsxs/Fragment from this file.
+ */
+
+import { h, Fragment as ActFragment } from './hyperscript.js';
+import type { Child, Props } from './types.js';
+
+export { ActFragment as Fragment };
+
+type JSXProps = Props & { children?: Child | Child[] };
+
+/**
+ * jsx() — called for elements with a single child (or no children).
+ * The automatic transform passes children inside props.
+ */
+export function jsx(
+  type: string | ((...args: unknown[]) => Element | DocumentFragment | void),
+  props: JSXProps,
+  _key?: string,
+): Element | DocumentFragment {
+  const { children, ...rest } = props;
+  const childArray: Child[] = children === undefined
+    ? []
+    : Array.isArray(children) ? children : [children];
+  return h(type, rest as Props, ...childArray);
+}
+
+/**
+ * jsxs() — called for elements with multiple children (array).
+ * Identical implementation — children is already an array.
+ */
+export function jsxs(
+  type: string | ((...args: unknown[]) => Element | DocumentFragment | void),
+  props: JSXProps,
+  _key?: string,
+): Element | DocumentFragment {
+  return jsx(type, props, _key);
+}
+
+/**
+ * jsxDEV() — called in development builds; same as jsx().
+ */
+export function jsxDEV(
+  type: string | ((...args: unknown[]) => Element | DocumentFragment | void),
+  props: JSXProps,
+  _key?: string,
+): Element | DocumentFragment {
+  return jsx(type, props, _key);
+}

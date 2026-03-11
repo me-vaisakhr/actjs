@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo — actjs</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 4rem auto; padding: 1rem; }
+    .add-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .add-row input { flex: 1; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+    .add-row button { padding: 0.5rem 1rem; background: #0070f3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; }
+    li span { flex: 1; }
+    li.done span { text-decoration: line-through; color: #999; }
+    li button { background: none; border: none; cursor: pointer; color: #e00; }
+    .stats { margin-top: 1rem; font-size: 0.85rem; color: #888; }
+    .filter-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .filter-row button { padding: 0.25rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: none; }
+    .filter-row button.active { background: #0070f3; color: white; border-color: #0070f3; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module" src="./main.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "name": "actjs",
+  "version": "0.1.0",
+  "description": "Lightweight SSR-first frontend library with fine-grained signals and island architecture",
+  "type": "module",
+  "main": "./dist/actjs.cjs.js",
+  "module": "./dist/actjs.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/actjs.esm.js",
+      "require": "./dist/actjs.cjs.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./jsx-runtime": {
+      "import": "./dist/jsx-runtime.js",
+      "types": "./dist/jsx-runtime.d.ts"
+    },
+    "./server": {
+      "import": "./dist/actjs.server.esm.js",
+      "types": "./dist/server.d.ts"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "unpkg": "./dist/actjs.iife.js",
+  "jsdelivr": "./dist/actjs.iife.js",
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && vite build --config vite.iife.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src tests",
+    "format": "prettier --write src tests",
+    "dev:counter": "VITE_EXAMPLE=counter vite --config examples/vite.config.ts",
+    "dev:todo": "VITE_EXAMPLE=todo vite --config examples/vite.config.ts",
+    "dev:blog": "VITE_EXAMPLE=blog vite --config examples/vite.config.ts",
+    "dev:landing": "VITE_EXAMPLE=landing vite --config examples/vite.config.ts"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.0",
+    "happy-dom": "^14.0.0",
+    "typescript": "^5.5.0",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.0.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": ["frontend", "signals", "ssr", "islands", "reactive"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vaisakhrkrishnan/actjs"
+  }
+}

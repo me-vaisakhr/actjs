@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "actjs": ["../src/index.ts"],
+      "actjs/jsx-runtime": ["../src/jsx-runtime.ts"],
+      "actjs/server": ["../src/hydration.ts"]
+    }
+  },
+  "include": ["."]
+}
