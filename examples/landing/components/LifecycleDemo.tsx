@@ -1,4 +1,4 @@
-import { component, signal, onInit, onMount, onDestroy, el } from 'actjs';
+import { component, signal, onInit, onMount, onDestroy } from 'actjs';
 
 interface LogEntry {
   type: 'init' | 'mount' | 'destroy';
@@ -22,15 +22,17 @@ export const LifecycleDemo = component(() => {
   onMount(() => addLog('mount', `onMount — DOM ready (mount #${++mountCount})`));
   onDestroy(() => addLog('destroy', 'onDestroy — cleanup'));
 
-  return () => el.div(
-    el.div({ class: 'd-muted', style: 'font-size:0.85rem' }, 'Lifecycle hooks fire on mount/destroy.'),
-    el.div({ class: 'lifecycle-log' },
-      ...logs().map(l =>
-        el.div({ class: 'log-entry' },
-          el.span({ class: 'ts' }, `[${l.ts}] `),
-          el.span({ class: 'log-' + l.type }, l.msg),
-        )
-      ),
-    ),
+  return () => (
+    <div>
+      <div class="d-muted">Lifecycle hooks fire on mount/destroy.</div>
+      <div class="lifecycle-log">
+        {logs().map(l => (
+          <div class="log-entry">
+            <span class="ts">[{l.ts}] </span>
+            <span class={'log-' + l.type}>{l.msg}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }, { hydrate: 'interactive' });

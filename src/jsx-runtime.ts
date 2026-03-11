@@ -11,6 +11,18 @@ import type { Child, Props } from './types.js';
 
 export { ActFragment as Fragment };
 
+// ─── JSX type declarations ────────────────────────────────────────────────────
+// TypeScript reads the exported JSX namespace from the jsxImportSource module.
+// It must be a named export — declare global does NOT work for jsxImportSource.
+
+export declare namespace JSX {
+  type Element = globalThis.Element | DocumentFragment;
+  // Allow any HTML attribute on any element — actjs passes all props through h()
+  interface IntrinsicElements {
+    [tagName: string]: Props & { children?: Child | Child[] };
+  }
+}
+
 type JSXProps = Props & { children?: Child | Child[] };
 
 /**

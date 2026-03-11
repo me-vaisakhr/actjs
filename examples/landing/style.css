@@ -1,0 +1,26 @@
+/* ─── Utility helpers ─────────────────────────────────────────────────────── */
+.d-row       { display: flex; align-items: center; justify-content: space-between; }
+.d-flex-gap  { display: flex; gap: 0.5rem; }
+.mt-sm       { margin-top: 0.75rem; }
+.mb-sm       { margin-bottom: 0.75rem; }
+.mb-0        { margin-bottom: 0; }
+.d-count-md  { font-size: 2.5rem; }        /* override default 3.5rem for ComputedDemo */
+
+/* ─── GlobalSignalDemo ────────────────────────────────────────────────────── */
+.gs-card     { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.9rem; }
+.gs-card-mb  { margin-bottom: 0.4rem; }
+.gs-header   { display: flex; align-items: center; justify-content: space-between; }
+.gs-sublabel { color: var(--muted); font-size: 0.75rem; margin-bottom: 0.3rem; }
+.gs-mono     { font-family: var(--font-mono); color: var(--accent); font-size: 0.9rem; }
+.gs-mono-b   { font-family: var(--font-mono); color: #a78bfa; font-size: 0.9rem; }
+
+/* ─── RouterDemo ──────────────────────────────────────────────────────────── */
+.router-dot-red   { background: var(--red); }
+.router-dot-amber { background: var(--accent3); }
+.router-dot-green { background: var(--green); }
+.rd-404           { font-size: 2rem; font-family: var(--font-display); font-weight: 800; color: var(--red); }
+.rd-title-lg      { font-size: 1.25rem; font-family: var(--font-display); font-weight: 700; margin-bottom: 0.3rem; }
+.rd-title-sm      { font-size: 1.1rem;  font-family: var(--font-display); font-weight: 700; margin-bottom: 0.3rem; }
+
+/* ─── ResourceDemo ────────────────────────────────────────────────────────── */
+.d-value-error { color: var(--red); border-color: rgba(255, 69, 69, 0.25); background: rgba(255, 69, 69, 0.06); }

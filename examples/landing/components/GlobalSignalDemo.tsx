@@ -1,4 +1,4 @@
-import { component, globalSignal, createApp, el } from 'actjs';
+import { component, globalSignal, createApp } from 'actjs';
 
 const THEMES = ['light', 'dark', 'system'] as const;
 
@@ -10,21 +10,25 @@ const ComponentA = component(() => {
     setTheme(next!);
   };
 
-  return () => el.div({ style: 'background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;margin-bottom:0.4rem' },
-    el.div({ class: 'd-muted', style: 'font-size:0.75rem;margin-bottom:0.3rem' }, 'ComponentA'),
-    el.div({ style: 'display:flex;align-items:center;justify-content:space-between' },
-      el.span({ style: 'font-family:var(--font-mono);color:var(--accent);font-size:0.9rem' }, theme()),
-      el.button({ class: 'd-btn', onclick: cycle }, 'cycle'),
-    ),
+  return () => (
+    <div class="gs-card gs-card-mb">
+      <div class="gs-sublabel">ComponentA</div>
+      <div class="gs-header">
+        <span class="gs-mono">{theme()}</span>
+        <button type="button" class="d-btn" onClick={cycle}>cycle</button>
+      </div>
+    </div>
   );
 }, { hydrate: 'interactive' });
 
 const ComponentB = component(() => {
   const [theme] = globalSignal<string>('landing-theme', 'light');
 
-  return () => el.div({ style: 'background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem' },
-    el.div({ class: 'd-muted', style: 'font-size:0.75rem;margin-bottom:0.3rem' }, 'ComponentB — reads same signal'),
-    el.div({ style: 'font-family:var(--font-mono);color:#a78bfa;font-size:0.9rem' }, theme()),
+  return () => (
+    <div class="gs-card">
+      <div class="gs-sublabel">ComponentB — reads same signal</div>
+      <div class="gs-mono-b">{theme()}</div>
+    </div>
   );
 }, { hydrate: 'interactive' });
 

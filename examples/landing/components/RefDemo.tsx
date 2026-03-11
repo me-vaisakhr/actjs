@@ -1,4 +1,4 @@
-import { component, signal, ref, onMount, el } from 'actjs';
+import { component, signal, ref, onMount } from 'actjs';
 
 export const RefDemo = component(() => {
   const inputRef = ref<HTMLInputElement>();
@@ -8,16 +8,18 @@ export const RefDemo = component(() => {
     inputRef.current?.focus();
   });
 
-  return () => el.div(
-    el.input({
-      ref: inputRef,
-      class: 'd-input',
-      placeholder: 'Auto-focused via ref()...',
-      onfocus: () => setFocused(true),
-      onblur: () => setFocused(false),
-    }),
-    el.div({ class: 'd-value' },
-      `ref.current.tagName = "${focused() ? 'INPUT (focused)' : 'INPUT'}"`,
-    ),
+  return () => (
+    <div>
+      <input
+        ref={inputRef}
+        class="d-input"
+        placeholder="Auto-focused via ref()..."
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      />
+      <div class="d-value">
+        {`ref.current.tagName = "${focused() ? 'INPUT (focused)' : 'INPUT'}"`}
+      </div>
+    </div>
   );
 }, { hydrate: 'interactive' });

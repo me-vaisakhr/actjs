@@ -1,4 +1,4 @@
-import { component, signal, computed, createApp, html } from 'actjs';
+import { component, signal, computed, createApp } from 'actjs';
 
 interface Todo {
   id: number;
@@ -39,35 +39,35 @@ const TodoApp = component(() => {
     setTodos(prev => prev.filter(t => t.id !== id));
   };
 
-  return () => html`
+  return () => (
     <div>
       <h1>Todo</h1>
-      <form onsubmit=${addTodo} class="add-row">
+      <form onSubmit={addTodo} class="add-row">
         <input
           type="text"
           placeholder="What needs to be done?"
-          value=${input()}
-          oninput=${(e: Event) => setInput((e.target as HTMLInputElement).value)}
+          value={input()}
+          onInput={(e: Event) => setInput((e.target as HTMLInputElement).value)}
         />
         <button type="submit">Add</button>
       </form>
       <div class="filter-row">
-        <button onclick=${() => setFilter('all')}    class=${filter() === 'all'    ? 'active' : ''}>All</button>
-        <button onclick=${() => setFilter('active')} class=${filter() === 'active' ? 'active' : ''}>Active</button>
-        <button onclick=${() => setFilter('done')}   class=${filter() === 'done'   ? 'active' : ''}>Done</button>
+        <button type="button" onClick={() => setFilter('all')}    class={filter() === 'all'    ? 'active' : ''}>All</button>
+        <button type="button" onClick={() => setFilter('active')} class={filter() === 'active' ? 'active' : ''}>Active</button>
+        <button type="button" onClick={() => setFilter('done')}   class={filter() === 'done'   ? 'active' : ''}>Done</button>
       </div>
       <ul>
-        ${filteredTodos().map(todo => html`
-          <li class=${todo.done ? 'done' : ''}>
-            <input type="checkbox" checked=${todo.done} onchange=${() => toggle(todo.id)} />
-            <span>${todo.text}</span>
-            <button onclick=${() => remove(todo.id)}>✕</button>
+        {filteredTodos().map(todo => (
+          <li class={todo.done ? 'done' : ''}>
+            <input placeholder="todo" type="checkbox" checked={todo.done} onChange={() => toggle(todo.id)} />
+            <span>{todo.text}</span>
+            <button type="button" onClick={() => remove(todo.id)}>✕</button>
           </li>
-        `)}
+        ))}
       </ul>
-      <p class="stats">${remaining()} item${remaining() === 1 ? '' : 's'} remaining</p>
+      <p class="stats">{remaining()} item{remaining() === 1 ? '' : 's'} remaining</p>
     </div>
-  `;
+  );
 }, { hydrate: 'interactive' });
 
 createApp('#root').mount(TodoApp);

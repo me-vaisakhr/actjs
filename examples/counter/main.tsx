@@ -1,4 +1,4 @@
-import { component, signal, computed, onMount, onDestroy, createApp, html } from 'actjs';
+import { component, signal, computed, onMount, onDestroy, createApp } from 'actjs';
 
 const Counter = component(() => {
   const [count, setCount] = signal(0);
@@ -11,17 +11,17 @@ const Counter = component(() => {
   onMount(() => console.log('Counter mounted'));
   onDestroy(() => console.log('Counter destroyed, final count:', count()));
 
-  return () => html`
+  return () => (
     <section>
       <h1>actjs Counter</h1>
-      <p class="count">${count()} (doubled: ${doubled()})</p>
+      <p class="count">{count()} (doubled: {doubled()})</p>
       <div>
-        <button onclick=${increment} class="primary">Increment</button>
-        <button onclick=${reset}>Reset</button>
-        <button onclick=${decrement} class="danger" disabled=${count() <= 0}>Decrement</button>
+        <button type="button" onClick={increment} class="primary">Increment</button>
+        <button type="button" onClick={reset}>Reset</button>
+        <button type="button" onClick={decrement} class="danger" disabled={count() <= 0}>Decrement</button>
       </div>
     </section>
-  `;
+  );
 }, { hydrate: 'interactive' });
 
 createApp('#root').mount(Counter);

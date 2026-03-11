@@ -1,4 +1,4 @@
-import { component, signal, el } from 'actjs';
+import { component, signal } from 'actjs';
 
 interface Route {
   path: string;
@@ -32,6 +32,15 @@ function findMatch(path: string) {
   return null;
 }
 
+const navLinks: [string, string][] = [
+  ['/', '/'],
+  ['/about', '/about'],
+  ['/blog/hello-world', '/blog/hello-world'],
+  ['/blog/actjs-intro', '/blog/actjs-intro'],
+  ['/user/42', '/user/42'],
+  ['/missing', '/missing'],
+];
+
 export const RouterDemo = component(() => {
   const [demoPath, setDemoPath] = signal('/');
   const [demoParams, setDemoParams] = signal<Record<string, string>>({});
@@ -49,44 +58,43 @@ export const RouterDemo = component(() => {
 
     let content: Element | DocumentFragment;
     if (!match || match.route.path === '*') {
-      content = el.div(
-        el.div({ style: 'font-size:2rem;font-family:var(--font-display);font-weight:800;color:var(--red)' }, '404'),
-        el.div({ class: 'd-muted', style: 'font-size:0.85rem' }, `No route matched "${path}"`),
+      content = (
+        <div>
+          <div class="rd-404">404</div>
+          <div class="d-muted">{`No route matched "${path}"`}</div>
+        </div>
       );
     } else if (match.route.path === '/' || match.route.path === '/about') {
-      content = el.div(
-        el.div({ style: 'font-size:1.25rem;font-family:var(--font-display);font-weight:700;margin-bottom:0.3rem' }, match.route.label),
-        el.div({ class: 'd-muted', style: 'font-size:0.85rem' }, `Matched route: ${match.route.path}`),
+      content = (
+        <div>
+          <div class="rd-title-lg">{match.route.label}</div>
+          <div class="d-muted">{`Matched route: ${match.route.path}`}</div>
+        </div>
       );
     } else {
-      content = el.div(
-        el.div({ style: 'font-size:1.1rem;font-family:var(--font-display);font-weight:700;margin-bottom:0.3rem' }, match.route.label),
-        el.div({ class: 'd-value' }, `params = ${JSON.stringify(p)}`),
+      content = (
+        <div>
+          <div class="rd-title-sm">{match.route.label}</div>
+          <div class="d-value">{`params = ${JSON.stringify(p)}`}</div>
+        </div>
       );
     }
 
-    const navLinks = [
-      ['/', '/'],
-      ['/about', '/about'],
-      ['/blog/hello-world', '/blog/hello-world'],
-      ['/blog/actjs-intro', '/blog/actjs-intro'],
-      ['/user/42', '/user/42'],
-      ['/missing', '/missing'],
-    ] as [string, string][];
-
-    return el.div({ class: 'router-demo' },
-      el.div({ class: 'router-bar' },
-        el.div({ class: 'router-dot', style: 'background:var(--red)' }),
-        el.div({ class: 'router-dot', style: 'background:var(--accent3)' }),
-        el.div({ class: 'router-dot', style: 'background:var(--green)' }),
-        el.div({ class: 'router-url' }, path),
-      ),
-      el.div({ class: 'router-content' }, content),
-      el.div({ class: 'router-nav' },
-        ...navLinks.map(([to, label]) =>
-          el.button({ class: 'router-link', onclick: () => demoNavigate(to) }, label)
-        ),
-      ),
+    return (
+      <div class="router-demo">
+        <div class="router-bar">
+          <div class="router-dot router-dot-red" />
+          <div class="router-dot router-dot-amber" />
+          <div class="router-dot router-dot-green" />
+          <div class="router-url">{path}</div>
+        </div>
+        <div class="router-content">{content}</div>
+        <div class="router-nav">
+          {navLinks.map(([to, label]) => (
+            <button type="button" class="router-link" onClick={() => demoNavigate(to)}>{label}</button>
+          ))}
+        </div>
+      </div>
     );
   };
 }, { hydrate: 'interactive' });

@@ -1,4 +1,4 @@
-import { component, signal, computed, el } from 'actjs';
+import { component, signal, computed } from 'actjs';
 
 interface Item {
   id: number;
@@ -30,29 +30,30 @@ export const TodoDemo = component(() => {
   const remove = (id: number) =>
     setItems(it => it.filter(i => i.id !== id));
 
-  return () => el.div(
-    el.div({ style: 'display:flex;gap:0.5rem;margin-bottom:0.75rem' },
-      el.input({
-        class: 'd-input',
-        style: 'margin-bottom:0',
-        placeholder: 'Add task...',
-        value: input(),
-        oninput: (e: Event) => setInput((e.target as HTMLInputElement).value),
-        onkeydown: (e: KeyboardEvent) => { if (e.key === 'Enter') add(); },
-      }),
-      el.button({ class: 'd-btn accent', onclick: add }, 'Add'),
-    ),
-    el.div(
-      ...items().map(item =>
-        el.div({ class: `todo-item${item.done ? ' done' : ''}` },
-          el.input({ type: 'checkbox', checked: item.done, onchange: () => toggle(item.id) }),
-          el.span(item.text),
-          el.button({ class: 'del-btn', onclick: () => remove(item.id) }, '×'),
-        )
-      ),
-    ),
-    el.div({ class: 'todo-count' },
-      `${remaining()} task${remaining() !== 1 ? 's' : ''} remaining`,
-    ),
+  return () => (
+    <div>
+      <div class="d-flex-gap mb-sm">
+        <input
+          class="d-input mb-0"
+          placeholder="Add task..."
+          value={input()}
+          onInput={(e: Event) => setInput((e.target as HTMLInputElement).value)}
+          onKeyDown={(e: KeyboardEvent) => { if (e.key === 'Enter') add(); }}
+        />
+        <button type="button" class="d-btn accent" onClick={add}>Add</button>
+      </div>
+      <div>
+        {items().map(item => (
+          <div class={`todo-item${item.done ? ' done' : ''}`}>
+            <input type="checkbox" checked={item.done} onChange={() => toggle(item.id)} />
+            <span>{item.text}</span>
+            <button type="button" class="del-btn" onClick={() => remove(item.id)}>×</button>
+          </div>
+        ))}
+      </div>
+      <div class="todo-count">
+        {`${remaining()} task${remaining() !== 1 ? 's' : ''} remaining`}
+      </div>
+    </div>
   );
 }, { hydrate: 'interactive' });

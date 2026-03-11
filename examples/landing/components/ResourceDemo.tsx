@@ -1,4 +1,4 @@
-import { component, signal, el } from 'actjs';
+import { component, signal } from 'actjs';
 
 interface User {
   name: string;
@@ -33,28 +33,32 @@ export const ResourceDemo = component(() => {
   return () => {
     let status: Element | DocumentFragment;
     if (loading()) {
-      status = el.div({ class: 'spinner' });
+      status = <div class="spinner" />;
     } else if (error()) {
-      status = el.div({ class: 'd-value', style: 'color:var(--red);border-color:rgba(255,69,69,0.25);background:rgba(255,69,69,0.06)' }, error()!);
+      status = <div class="d-value d-value-error">{error()!}</div>;
     } else if (data()) {
-      status = el.div(
-        ...data()!.map(u =>
-          el.div({ class: 'resource-card' },
-            el.div({ class: 'resource-name' }, u.name),
-            el.div({ class: 'resource-meta' }, u.role),
-          )
-        ),
+      status = (
+        <div>
+          {data()!.map(u => (
+            <div class="resource-card">
+              <div class="resource-name">{u.name}</div>
+              <div class="resource-meta">{u.role}</div>
+            </div>
+          ))}
+        </div>
       );
     } else {
-      status = el.div({ class: 'd-muted', style: 'font-size:0.85rem' }, 'Click "Fetch users" to load data.');
+      status = <div class="d-muted">Click "Fetch users" to load data.</div>;
     }
 
-    return el.div(
-      el.div({ style: 'display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem' },
-        el.div({ class: 'd-muted', style: 'font-size:0.85rem' }, 'Simulates async fetch with loading/error states'),
-        el.button({ class: 'd-btn accent', onclick: fetchData }, 'Fetch users'),
-      ),
-      status,
+    return (
+      <div>
+        <div class="d-row mb-sm">
+          <div class="d-muted">Simulates async fetch with loading/error states</div>
+          <button type="button" class="d-btn accent" onClick={fetchData}>Fetch users</button>
+        </div>
+        {status}
+      </div>
     );
   };
 }, { hydrate: 'interactive' });

@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>actjs — Reactive UI Without the Runtime</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
   <style>
     /* ─── Reset & Base ──────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       --bg: #0d0d0f;
@@ -29,7 +39,9 @@
       --font-body: 'DM Sans', sans-serif;
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       background: var(--bg);
@@ -41,27 +53,56 @@
     }
 
     /* ─── Typography ─────────────────────────────────────────────────────────── */
-    h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.1; }
-    code, pre { font-family: var(--font-mono); }
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: var(--font-display);
+      line-height: 1.1;
+    }
+
+    code,
+    pre {
+      font-family: var(--font-mono);
+    }
 
     /* ─── Layout ─────────────────────────────────────────────────────────────── */
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
-    .section { padding: 5rem 0; }
-    .section + .section { border-top: 1px solid var(--border); }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .section {
+      padding: 5rem 0;
+    }
+
+    .section+.section {
+      border-top: 1px solid var(--border);
+    }
 
     /* ─── Nav ────────────────────────────────────────────────────────────────── */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(13,13,15,0.85);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(13, 13, 15, 0.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0 2rem;
     }
+
     nav .inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       height: 56px;
     }
+
     .nav-logo {
       font-family: var(--font-display);
       font-weight: 800;
@@ -70,7 +111,13 @@
       text-decoration: none;
       letter-spacing: -0.02em;
     }
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
@@ -78,7 +125,11 @@
       font-weight: 500;
       transition: color 0.15s;
     }
-    .nav-links a:hover { color: var(--text); }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
     .nav-badge {
       background: var(--accent);
       color: #0d0d0f;
@@ -95,6 +146,7 @@
       position: relative;
       overflow: hidden;
     }
+
     .hero::before {
       content: '';
       position: absolute;
@@ -103,11 +155,14 @@
       transform: translateX(-50%);
       width: 900px;
       height: 900px;
-      background: radial-gradient(ellipse, rgba(201,255,51,0.06) 0%, transparent 65%);
+      background: radial-gradient(ellipse, rgba(201, 255, 51, 0.06) 0%, transparent 65%);
       pointer-events: none;
     }
+
     .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       background: var(--bg3);
       border: 1px solid var(--border);
       border-radius: 999px;
@@ -117,7 +172,11 @@
       color: var(--muted);
       margin-bottom: 2rem;
     }
-    .hero-eyebrow span { color: var(--accent); }
+
+    .hero-eyebrow span {
+      color: var(--accent);
+    }
+
     .hero h1 {
       font-size: clamp(3rem, 7vw, 5.5rem);
       font-weight: 800;
@@ -125,7 +184,12 @@
       line-height: 1.0;
       margin-bottom: 1.5rem;
     }
-    .hero h1 em { font-style: normal; color: var(--accent); }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
     .hero-sub {
       font-size: 1.2rem;
       color: var(--muted);
@@ -133,9 +197,17 @@
       line-height: 1.7;
       margin-bottom: 2.5rem;
     }
-    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
     .btn {
-      display: inline-flex; align-items: center; gap: 0.4rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       padding: 0.7rem 1.4rem;
       border-radius: 6px;
       font-weight: 600;
@@ -145,22 +217,34 @@
       border: 1px solid transparent;
       transition: all 0.15s;
     }
+
     .btn-primary {
       background: var(--accent);
       color: #0d0d0f;
     }
-    .btn-primary:hover { background: #d9ff55; }
+
+    .btn-primary:hover {
+      background: #d9ff55;
+    }
+
     .btn-secondary {
       background: transparent;
       color: var(--text);
       border-color: var(--border);
     }
-    .btn-secondary:hover { border-color: var(--muted); background: var(--bg3); }
+
+    .btn-secondary:hover {
+      border-color: var(--muted);
+      background: var(--bg3);
+    }
 
     .hero-install {
-      display: flex; align-items: center; gap: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       margin-top: 2rem;
     }
+
     .hero-install code {
       background: var(--bg3);
       border: 1px solid var(--border);
@@ -169,7 +253,11 @@
       font-size: 0.9rem;
       color: var(--accent);
     }
-    .hero-install span { color: var(--muted); font-size: 0.85rem; }
+
+    .hero-install span {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
 
     /* ─── Feature strip ─────────────────────────────────────────────────────── */
     .features-strip {
@@ -178,16 +266,29 @@
       padding: 2rem 0;
       overflow: hidden;
     }
+
     .features-strip-inner {
-      display: flex; gap: 3rem; flex-wrap: wrap;
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
     }
+
     .feat-item {
-      display: flex; align-items: center; gap: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
       color: var(--muted);
       font-size: 0.875rem;
       white-space: nowrap;
     }
-    .feat-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    .feat-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
 
     /* ─── Section headers ────────────────────────────────────────────────────── */
     .section-label {
@@ -199,12 +300,14 @@
       text-transform: uppercase;
       margin-bottom: 0.75rem;
     }
+
     .section-title {
       font-size: clamp(1.75rem, 3.5vw, 2.75rem);
       font-weight: 800;
       letter-spacing: -0.02em;
       margin-bottom: 1rem;
     }
+
     .section-desc {
       color: var(--muted);
       font-size: 1.05rem;
@@ -219,10 +322,21 @@
       grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
     }
-    .demo-grid.cols-1 { grid-template-columns: 1fr; }
-    .demo-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .demo-grid.cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    .demo-grid.cols-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
     @media (max-width: 768px) {
-      .demo-grid, .demo-grid.cols-3 { grid-template-columns: 1fr; }
+
+      .demo-grid,
+      .demo-grid.cols-3 {
+        grid-template-columns: 1fr;
+      }
     }
 
     .demo-card {
@@ -231,17 +345,22 @@
       border-radius: 12px;
       overflow: hidden;
     }
+
     .demo-card-header {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       padding: 1rem 1.25rem;
       border-bottom: 1px solid var(--border);
     }
+
     .demo-card-title {
       font-family: var(--font-mono);
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--muted);
     }
+
     .demo-card-badge {
       font-family: var(--font-mono);
       font-size: 0.65rem;
@@ -249,23 +368,53 @@
       border-radius: 4px;
       font-weight: 600;
     }
-    .badge-signal { background: rgba(201,255,51,0.15); color: var(--accent); }
-    .badge-computed { background: rgba(124,58,237,0.2); color: #a78bfa; }
-    .badge-component { background: rgba(249,115,22,0.15); color: var(--accent3); }
-    .badge-router { background: rgba(51,170,255,0.15); color: var(--blue); }
-    .badge-lifecycle { background: rgba(51,255,153,0.12); color: var(--green); }
-    .badge-resource { background: rgba(255,69,69,0.12); color: var(--red); }
-    .badge-live { background: rgba(201,255,51,0.1); color: var(--accent); }
+
+    .badge-signal {
+      background: rgba(201, 255, 51, 0.15);
+      color: var(--accent);
+    }
+
+    .badge-computed {
+      background: rgba(124, 58, 237, 0.2);
+      color: #a78bfa;
+    }
+
+    .badge-component {
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--accent3);
+    }
+
+    .badge-router {
+      background: rgba(51, 170, 255, 0.15);
+      color: var(--blue);
+    }
+
+    .badge-lifecycle {
+      background: rgba(51, 255, 153, 0.12);
+      color: var(--green);
+    }
+
+    .badge-resource {
+      background: rgba(255, 69, 69, 0.12);
+      color: var(--red);
+    }
+
+    .badge-live {
+      background: rgba(201, 255, 51, 0.1);
+      color: var(--accent);
+    }
 
     .demo-preview {
       padding: 1.5rem 1.25rem;
       min-height: 100px;
     }
+
     .demo-code {
       padding: 0;
       background: var(--bg);
       border-top: 1px solid var(--border);
     }
+
     .demo-code pre {
       padding: 1.25rem;
       font-size: 0.78rem;
@@ -273,13 +422,32 @@
       overflow-x: auto;
       color: #c8c8d8;
     }
+
     /* Syntax colors */
-    .kw { color: #a78bfa; }
-    .fn { color: #7dd3fc; }
-    .str { color: #86efac; }
-    .num { color: #fda4af; }
-    .cm { color: #4b4b60; font-style: italic; }
-    .pn { color: #fb923c; }
+    .kw {
+      color: #a78bfa;
+    }
+
+    .fn {
+      color: #7dd3fc;
+    }
+
+    .str {
+      color: #86efac;
+    }
+
+    .num {
+      color: #fda4af;
+    }
+
+    .cm {
+      color: #4b4b60;
+      font-style: italic;
+    }
+
+    .pn {
+      color: #fb923c;
+    }
 
     /* ─── Demo interactive elements ─────────────────────────────────────────── */
     .d-count {
@@ -290,8 +458,19 @@
       line-height: 1;
       margin-bottom: 0.25rem;
     }
-    .d-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; }
-    .d-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .d-label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .d-btns {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
     .d-btn {
       padding: 0.4rem 0.9rem;
       border-radius: 5px;
@@ -303,14 +482,43 @@
       cursor: pointer;
       transition: all 0.12s;
     }
-    .d-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .d-btn.green { border-color: rgba(51,255,153,0.3); color: var(--green); }
-    .d-btn.green:hover { background: rgba(51,255,153,0.1); }
-    .d-btn.red { border-color: rgba(255,69,69,0.3); color: var(--red); }
-    .d-btn.red:hover { background: rgba(255,69,69,0.1); }
-    .d-btn.accent { border-color: rgba(201,255,51,0.4); color: var(--accent); }
-    .d-btn.accent:hover { background: rgba(201,255,51,0.1); }
-    .d-btn:disabled { opacity: 0.35; cursor: default; }
+
+    .d-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .d-btn.green {
+      border-color: rgba(51, 255, 153, 0.3);
+      color: var(--green);
+    }
+
+    .d-btn.green:hover {
+      background: rgba(51, 255, 153, 0.1);
+    }
+
+    .d-btn.red {
+      border-color: rgba(255, 69, 69, 0.3);
+      color: var(--red);
+    }
+
+    .d-btn.red:hover {
+      background: rgba(255, 69, 69, 0.1);
+    }
+
+    .d-btn.accent {
+      border-color: rgba(201, 255, 51, 0.4);
+      color: var(--accent);
+    }
+
+    .d-btn.accent:hover {
+      background: rgba(201, 255, 51, 0.1);
+    }
+
+    .d-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
 
     .d-input {
       width: 100%;
@@ -325,20 +533,28 @@
       transition: border-color 0.15s;
       margin-bottom: 0.5rem;
     }
-    .d-input:focus { border-color: var(--accent); }
+
+    .d-input:focus {
+      border-color: var(--accent);
+    }
 
     .d-value {
       font-family: var(--font-mono);
       font-size: 0.85rem;
       color: var(--accent);
-      background: rgba(201,255,51,0.07);
-      border: 1px solid rgba(201,255,51,0.15);
+      background: rgba(201, 255, 51, 0.07);
+      border: 1px solid rgba(201, 255, 51, 0.15);
       padding: 0.4rem 0.75rem;
       border-radius: 5px;
       margin-top: 0.5rem;
       word-break: break-all;
     }
-    .d-muted { color: var(--muted); font-size: 0.85rem; }
+
+    .d-muted {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
     .d-tag {
       display: inline-block;
       font-family: var(--font-mono);
@@ -347,29 +563,67 @@
       border-radius: 3px;
       margin-right: 0.25rem;
     }
-    .d-tag.orange { background: rgba(249,115,22,0.15); color: var(--accent3); }
-    .d-tag.purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
-    .d-tag.green { background: rgba(51,255,153,0.1); color: var(--green); }
+
+    .d-tag.orange {
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--accent3);
+    }
+
+    .d-tag.purple {
+      background: rgba(124, 58, 237, 0.15);
+      color: #a78bfa;
+    }
+
+    .d-tag.green {
+      background: rgba(51, 255, 153, 0.1);
+      color: var(--green);
+    }
 
     /* ─── Todo list demo ─────────────────────────────────────────────────────── */
     .todo-item {
-      display: flex; align-items: center; gap: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
       padding: 0.5rem 0;
       border-bottom: 1px solid var(--border);
       font-size: 0.9rem;
     }
-    .todo-item:last-child { border-bottom: none; }
-    .todo-item input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
-    .todo-item.done span { text-decoration: line-through; color: var(--muted); }
+
+    .todo-item:last-child {
+      border-bottom: none;
+    }
+
+    .todo-item input[type=checkbox] {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .todo-item.done span {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
     .todo-item .del-btn {
       margin-left: auto;
-      background: none; border: none;
-      color: var(--muted); cursor: pointer; font-size: 1rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
       padding: 0 0.2rem;
       transition: color 0.12s;
     }
-    .todo-item .del-btn:hover { color: var(--red); }
-    .todo-count { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); margin-top: 0.75rem; }
+
+    .todo-item .del-btn:hover {
+      color: var(--red);
+    }
+
+    .todo-count {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+    }
 
     /* ─── Router demo ────────────────────────────────────────────────────────── */
     .router-demo {
@@ -378,13 +632,22 @@
       border-radius: 8px;
       overflow: hidden;
     }
+
     .router-bar {
-      display: flex; align-items: center; gap: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       padding: 0.6rem 1rem;
       background: var(--bg3);
       border-bottom: 1px solid var(--border);
     }
-    .router-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .router-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
     .router-url {
       flex: 1;
       font-family: var(--font-mono);
@@ -395,18 +658,34 @@
       border-radius: 4px;
       padding: 0.25rem 0.6rem;
     }
-    .router-content { padding: 1.25rem; min-height: 100px; }
-    .router-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0.75rem 1rem; border-top: 1px solid var(--border); }
+
+    .router-content {
+      padding: 1.25rem;
+      min-height: 100px;
+    }
+
+    .router-nav {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+
     .router-link {
       font-family: var(--font-mono);
       font-size: 0.75rem;
       color: var(--blue);
       cursor: pointer;
       text-decoration: underline;
-      background: none; border: none;
+      background: none;
+      border: none;
       padding: 0;
     }
-    .router-link:hover { color: var(--accent); }
+
+    .router-link:hover {
+      color: var(--accent);
+    }
 
     /* ─── Lifecycle log ──────────────────────────────────────────────────────── */
     .lifecycle-log {
@@ -420,11 +699,26 @@
       overflow-y: auto;
       margin-top: 0.75rem;
     }
-    .log-entry { padding: 0.15rem 0; }
-    .log-entry .ts { color: var(--muted); }
-    .log-init { color: var(--accent); }
-    .log-mount { color: var(--green); }
-    .log-destroy { color: var(--red); }
+
+    .log-entry {
+      padding: 0.15rem 0;
+    }
+
+    .log-entry .ts {
+      color: var(--muted);
+    }
+
+    .log-init {
+      color: var(--accent);
+    }
+
+    .log-mount {
+      color: var(--green);
+    }
+
+    .log-destroy {
+      color: var(--red);
+    }
 
     /* ─── Resource/fetch demo ────────────────────────────────────────────────── */
     .resource-card {
@@ -434,26 +728,48 @@
       padding: 0.75rem 1rem;
       margin-bottom: 0.5rem;
     }
-    .resource-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.15rem; }
-    .resource-meta { color: var(--muted); font-size: 0.8rem; }
+
+    .resource-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .resource-meta {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
     .spinner {
-      width: 24px; height: 24px;
+      width: 24px;
+      height: 24px;
       border: 2px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 1rem auto;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     /* ─── API table ──────────────────────────────────────────────────────────── */
-    .api-table { width: 100%; border-collapse: collapse; }
-    .api-table th, .api-table td {
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .api-table th,
+    .api-table td {
       padding: 0.75rem 1rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
       font-size: 0.875rem;
     }
+
     .api-table th {
       font-family: var(--font-mono);
       font-size: 0.75rem;
@@ -463,54 +779,116 @@
       text-transform: uppercase;
       background: var(--bg3);
     }
-    .api-table td:first-child { font-family: var(--font-mono); color: var(--blue); font-size: 0.82rem; }
-    .api-table td:last-child { color: var(--muted); font-size: 0.83rem; }
-    .api-table tr:last-child td { border-bottom: none; }
+
+    .api-table td:first-child {
+      font-family: var(--font-mono);
+      color: var(--blue);
+      font-size: 0.82rem;
+    }
+
+    .api-table td:last-child {
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .api-table tr:last-child td {
+      border-bottom: none;
+    }
 
     /* ─── Comparison table ───────────────────────────────────────────────────── */
-    .cmp-table { width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-    .cmp-table th, .cmp-table td {
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .cmp-table th,
+    .cmp-table td {
       padding: 0.7rem 1.1rem;
       text-align: center;
       font-size: 0.85rem;
       border-bottom: 1px solid var(--border);
     }
-    .cmp-table th { background: var(--bg3); font-weight: 600; }
-    .cmp-table td:first-child { text-align: left; color: var(--muted); }
-    .cmp-table tr:last-child td { border-bottom: none; }
-    .cmp-yes { color: var(--green); font-weight: 700; }
-    .cmp-no { color: var(--muted); }
-    .cmp-col-act { color: var(--accent); }
+
+    .cmp-table th {
+      background: var(--bg3);
+      font-weight: 600;
+    }
+
+    .cmp-table td:first-child {
+      text-align: left;
+      color: var(--muted);
+    }
+
+    .cmp-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cmp-yes {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .cmp-no {
+      color: var(--muted);
+    }
+
+    .cmp-col-act {
+      color: var(--accent);
+    }
 
     /* ─── Island strategy cards ──────────────────────────────────────────────── */
-    .island-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
-    @media (max-width: 768px) { .island-grid { grid-template-columns: 1fr; } }
+    .island-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .island-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .island-card {
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.5rem;
     }
+
     .island-icon {
-      width: 40px; height: 40px;
+      width: 40px;
+      height: 40px;
       border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.2rem;
       margin-bottom: 1rem;
     }
+
     .island-card h3 {
       font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
     }
-    .island-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+    .island-card p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
     .island-card code {
       display: inline-block;
       margin-top: 0.75rem;
       font-size: 0.78rem;
       color: var(--accent);
-      background: rgba(201,255,51,0.08);
+      background: rgba(201, 255, 51, 0.08);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
     }
@@ -518,13 +896,24 @@
     /* ─── Quote/callout ─────────────────────────────────────────────────────── */
     .callout {
       border-left: 3px solid var(--accent);
-      background: rgba(201,255,51,0.04);
+      background: rgba(201, 255, 51, 0.04);
       padding: 1rem 1.25rem;
       border-radius: 0 6px 6px 0;
       margin: 1.5rem 0;
     }
-    .callout p { color: var(--text); font-size: 0.9rem; line-height: 1.7; }
-    .callout code { color: var(--accent); background: rgba(201,255,51,0.1); padding: 0.1rem 0.35rem; border-radius: 3px; }
+
+    .callout p {
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .callout code {
+      color: var(--accent);
+      background: rgba(201, 255, 51, 0.1);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+    }
 
     /* ─── Footer ─────────────────────────────────────────────────────────────── */
     footer {
@@ -532,189 +921,236 @@
       padding: 3rem 0;
       text-align: center;
     }
-    footer .logo { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--accent); margin-bottom: 0.5rem; }
-    footer p { color: var(--muted); font-size: 0.875rem; }
+
+    footer .logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    footer p {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
 
     /* ─── Transitions ────────────────────────────────────────────────────────── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .fade-up { animation: fadeUp 0.5s ease both; }
-    .fade-up-2 { animation: fadeUp 0.5s 0.1s ease both; }
-    .fade-up-3 { animation: fadeUp 0.5s 0.2s ease both; }
+
+    .fade-up {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .fade-up-2 {
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .fade-up-3 {
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
 
     /* global signal flash */
     .gs-flash {
       transition: background 0.15s;
     }
+
     .gs-flash.flash-on {
-      background: rgba(201,255,51,0.15) !important;
+      background: rgba(201, 255, 51, 0.15) !important;
     }
   </style>
 </head>
+
 <body>
 
-<!-- ─── Navigation ─────────────────────────────────────────────────────── -->
-<nav>
-  <div class="inner">
-    <a href="#" class="nav-logo">actjs</a>
-    <ul class="nav-links">
-      <li><a href="#signals">Signals</a></li>
-      <li><a href="#components">Components</a></li>
-      <li><a href="#router">Router</a></li>
-      <li><a href="#ssr">SSR</a></li>
-      <li><a href="#api">API</a></li>
-      <li><span class="nav-badge">v1.0</span></li>
-    </ul>
-  </div>
-</nav>
-
-<!-- ─── Hero ────────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <div class="container">
-    <div class="hero-eyebrow"><span>NEW</span> Client-side router now included</div>
-    <h1 class="fade-up">Reactive UI<br/>Without the<br/><em>Runtime.</em></h1>
-    <p class="hero-sub fade-up-2">
-      Fine-grained signals. Zero virtual DOM. SSR-first with island hydration.
-      Ships as ESM, CJS, and a single IIFE script tag. No compiler required.
-    </p>
-    <div class="hero-actions fade-up-3">
-      <a href="#signals" class="btn btn-primary">See it live</a>
-      <a href="#api" class="btn btn-secondary">Full API reference</a>
+  <!-- ─── Navigation ─────────────────────────────────────────────────────── -->
+  <nav>
+    <div class="inner">
+      <a href="#" class="nav-logo">actjs</a>
+      <ul class="nav-links">
+        <li><a href="#signals">Signals</a></li>
+        <li><a href="#components">Components</a></li>
+        <li><a href="#router">Router</a></li>
+        <li><a href="#ssr">SSR</a></li>
+        <li><a href="#api">API</a></li>
+        <li><span class="nav-badge">v1.0</span></li>
+      </ul>
     </div>
-    <div class="hero-install">
-      <code>npm install actjs</code>
-      <span>or just drop in a &lt;script&gt; tag</span>
+  </nav>
+
+  <!-- ─── Hero ────────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-eyebrow"><span>NEW</span> Client-side router now included</div>
+      <h1 class="fade-up">Reactive UI<br />Without the<br /><em>Runtime.</em></h1>
+      <p class="hero-sub fade-up-2">
+        Fine-grained signals. Zero virtual DOM. SSR-first with island hydration.
+        Ships as ESM, CJS, and a single IIFE script tag. No compiler required.
+      </p>
+      <div class="hero-actions fade-up-3">
+        <a href="#signals" class="btn btn-primary">See it live</a>
+        <a href="#api" class="btn btn-secondary">Full API reference</a>
+      </div>
+      <div class="hero-install">
+        <code>npm install actjs</code>
+        <span>or just drop in a &lt;script&gt; tag</span>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Feature strip ───────────────────────────────────────────────────── -->
-<div class="features-strip">
-  <div class="container">
-    <div class="features-strip-inner">
-      <div class="feat-item"><div class="dot"></div>Fine-grained signals</div>
-      <div class="feat-item"><div class="dot"></div>Computed derivations</div>
-      <div class="feat-item"><div class="dot"></div>No virtual DOM</div>
-      <div class="feat-item"><div class="dot"></div>Island hydration</div>
-      <div class="feat-item"><div class="dot"></div>Client-side router</div>
-      <div class="feat-item"><div class="dot"></div>SSR + streaming</div>
-      <div class="feat-item"><div class="dot"></div>JSX support</div>
-      <div class="feat-item"><div class="dot"></div>Zero runtime deps</div>
-      <div class="feat-item"><div class="dot"></div>100% test coverage</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── Signals ──────────────────────────────────────────────────────────── -->
-<section class="section" id="signals">
-  <div class="container">
-    <div class="section-label">Core reactivity</div>
-    <h2 class="section-title">Signals &amp; Computed</h2>
-    <p class="section-desc">
-      A signal is a value that components subscribe to automatically when they read it.
-      No watchers. No dependency lists. Just call the getter inside a render.
-    </p>
-
-    <div class="demo-grid">
-      <!-- Counter demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">signal() — counter</span>
-          <span class="demo-card-badge badge-signal">LIVE</span>
+  <!-- ─── Feature strip ───────────────────────────────────────────────────── -->
+  <div class="features-strip">
+    <div class="container">
+      <div class="features-strip-inner">
+        <div class="feat-item">
+          <div class="dot"></div>Fine-grained signals
         </div>
-        <div class="demo-preview" id="signal-counter-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> [count, setCount] = <span class="fn">signal</span>(<span class="num">0</span>);
-
-<span class="cm">// Getter call inside render = subscription</span>
-<span class="kw">return</span> () =&gt; html<span class="str">`
-  &lt;div&gt;
-    &lt;p&gt;</span>${count()}<span class="str">&lt;/p&gt;
-    &lt;button onclick=</span>${increment}<span class="str">&gt;+&lt;/button&gt;
-  &lt;/div&gt;
-`</span>;</pre>
+        <div class="feat-item">
+          <div class="dot"></div>Computed derivations
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>No virtual DOM
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>Island hydration
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>Client-side router
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>SSR + streaming
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>JSX support
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>Zero runtime deps
+        </div>
+        <div class="feat-item">
+          <div class="dot"></div>100% test coverage
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Computed demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">computed() — derived state</span>
-          <span class="demo-card-badge badge-computed">LIVE</span>
+  <!-- ─── Signals ──────────────────────────────────────────────────────────── -->
+  <section class="section" id="signals">
+    <div class="container">
+      <div class="section-label">Core reactivity</div>
+      <h2 class="section-title">Signals &amp; Computed</h2>
+      <p class="section-desc">
+        A signal is a value that components subscribe to automatically when they read it.
+        No watchers. No dependency lists. Just call the getter inside a render.
+      </p>
+
+      <div class="demo-grid">
+        <!-- Counter demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">signal() — counter</span>
+            <span class="demo-card-badge badge-signal">LIVE</span>
+          </div>
+          <div class="demo-preview" id="signal-counter-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> [count, setCount] = <span class="fn">signal</span>(<span class="num">0</span>);
+
+<span class="cm">// Getter call inside render = subscription</span>
+<span class="kw">return</span> () =&gt; (
+  &lt;<span class="fn">div</span>&gt;
+    &lt;<span class="fn">p</span>&gt;<span class="pn">{</span>count()<span class="pn">}</span>&lt;/<span class="fn">p</span>&gt;
+    &lt;<span class="fn">button</span> <span class="pn">type</span>=<span class="str">"button"</span> <span class="pn">onClick</span>={increment}&gt;+&lt;/<span class="fn">button</span>&gt;
+  &lt;/<span class="fn">div</span>&gt;
+);</code></pre>
+          </div>
         </div>
-        <div class="demo-preview" id="computed-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> [n, setN] = <span class="fn">signal</span>(<span class="num">4</span>);
+
+        <!-- Computed demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">computed() — derived state</span>
+            <span class="demo-card-badge badge-computed">LIVE</span>
+          </div>
+          <div class="demo-preview" id="computed-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> [n, setN] = <span class="fn">signal</span>(<span class="num">4</span>);
 
 <span class="cm">// Re-computes only when n() changes</span>
 <span class="kw">const</span> squared  = <span class="fn">computed</span>(() =&gt; n() ** <span class="num">2</span>);
-<span class="kw">const</span> isEven   = <span class="fn">computed</span>(() =&gt; n() % <span class="num">2</span> === <span class="num">0</span>);</pre>
+<span class="kw">const</span> isEven   = <span class="fn">computed</span>(() =&gt; n() % <span class="num">2</span> === <span class="num">0</span>);</code></pre>
+          </div>
         </div>
-      </div>
 
-      <!-- Text binding demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">Reactive text binding</span>
-          <span class="demo-card-badge badge-signal">LIVE</span>
-        </div>
-        <div class="demo-preview" id="textbind-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> [name, setName] = <span class="fn">signal</span>(<span class="str">''</span>);
+        <!-- Text binding demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">Reactive text binding</span>
+            <span class="demo-card-badge badge-signal">LIVE</span>
+          </div>
+          <div class="demo-preview" id="textbind-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> [name, setName] = <span class="fn">signal</span>(<span class="str">''</span>);
 
 <span class="cm">// Input updates signal → greeting re-renders</span>
-<span class="kw">return</span> () =&gt; html<span class="str">`
-  &lt;div&gt;
-    &lt;input oninput=</span>${(e: Event) =&gt; setName((e.target as HTMLInputElement).value)}<span class="str"> /&gt;
-    &lt;p&gt;Hello, </span>${name()}<span class="str">!&lt;/p&gt;
-  &lt;/div&gt;
-`</span>;</pre>
+<span class="kw">return</span> () =&gt; (
+  &lt;<span class="fn">div</span>&gt;
+    &lt;<span class="fn">input</span> <span class="pn">onInput</span>={e =&gt; <span class="fn">setName</span>(e.target.value)} /&gt;
+    &lt;<span class="fn">p</span>&gt;Hello, <span class="pn">{</span>name()<span class="pn">}</span>!&lt;/<span class="fn">p</span>&gt;
+  &lt;/<span class="fn">div</span>&gt;
+);</code></pre>
+          </div>
         </div>
-      </div>
 
-      <!-- globalSignal demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">globalSignal() — shared state</span>
-          <span class="demo-card-badge badge-signal">LIVE</span>
-        </div>
-        <div class="demo-preview" id="global-signal-preview"></div>
-        <div class="demo-code">
-          <pre><span class="cm">// Same key = same signal everywhere</span>
+        <!-- globalSignal demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">globalSignal() — shared state</span>
+            <span class="demo-card-badge badge-signal">LIVE</span>
+          </div>
+          <div class="demo-preview" id="global-signal-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="cm">// Same key = same signal everywhere</span>
 <span class="kw">const</span> [theme, setTheme] =
   <span class="fn">globalSignal</span>(<span class="str">'theme'</span>, <span class="str">'light'</span>);
 
 <span class="cm">// ComponentA and ComponentB share it</span>
-<span class="fn">setTheme</span>(<span class="str">'dark'</span>); <span class="cm">// both re-render</span></pre>
+<span class="fn">setTheme</span>(<span class="str">'dark'</span>); <span class="cm">// both re-render</span></code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Components ────────────────────────────────────────────────────────── -->
-<section class="section" id="components">
-  <div class="container">
-    <div class="section-label">Component model</div>
-    <h2 class="section-title">Components &amp; Lifecycle</h2>
-    <p class="section-desc">
-      <code style="color:var(--accent)">component(setup)</code> runs setup once.
-      Setup returns a render function that re-runs when its signals change.
-      Handlers, derived state, and lifecycle hooks live in setup — created once, never re-created.
-    </p>
+  <!-- ─── Components ────────────────────────────────────────────────────────── -->
+  <section class="section" id="components">
+    <div class="container">
+      <div class="section-label">Component model</div>
+      <h2 class="section-title">Components &amp; Lifecycle</h2>
+      <p class="section-desc">
+        <code style="color:var(--accent)">component(setup)</code> runs setup once.
+        Setup returns a render function that re-runs when its signals change.
+        Handlers, derived state, and lifecycle hooks live in setup — created once, never re-created.
+      </p>
 
-    <div class="demo-grid">
-      <!-- Todo list demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">component() — todo list</span>
-          <span class="demo-card-badge badge-component">LIVE</span>
-        </div>
-        <div class="demo-preview" id="todo-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> Todo = <span class="fn">component</span>(() =&gt; {
+      <div class="demo-grid">
+        <!-- Todo list demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">component() — todo list</span>
+            <span class="demo-card-badge badge-component">LIVE</span>
+          </div>
+          <div class="demo-preview" id="todo-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> Todo = <span class="fn">component</span>(() =&gt; {
   <span class="kw">const</span> [items, setItems] = <span class="fn">signal</span>([]);
 
   <span class="cm">// handlers created once in setup</span>
@@ -722,39 +1158,39 @@
     <span class="fn">setItems</span>(it =&gt; [...it, { text, done: <span class="kw">false</span> }]);
 
   <span class="kw">return</span> () =&gt; <span class="cm">/* render with items() */</span>;
-});</pre>
+});</code></pre>
+          </div>
         </div>
-      </div>
 
-      <!-- Lifecycle demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">onInit / onMount / onDestroy</span>
-          <span class="demo-card-badge badge-lifecycle">LIVE</span>
-        </div>
-        <div class="demo-preview" id="lifecycle-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> C = <span class="fn">component</span>(() =&gt; {
+        <!-- Lifecycle demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">onInit / onMount / onDestroy</span>
+            <span class="demo-card-badge badge-lifecycle">LIVE</span>
+          </div>
+          <div class="demo-preview" id="lifecycle-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> C = <span class="fn">component</span>(() =&gt; {
   <span class="cm">// server + client</span>
   <span class="fn">onInit</span>(() =&gt; log(<span class="str">'init'</span>));
   <span class="cm">// client only — DOM ready</span>
   <span class="fn">onMount</span>(() =&gt; log(<span class="str">'mount'</span>));
   <span class="cm">// client only — cleanup</span>
   <span class="fn">onDestroy</span>(() =&gt; log(<span class="str">'destroy'</span>));
-  <span class="kw">return</span> () =&gt; html<span class="str">`&lt;div&gt;Hello&lt;/div&gt;`</span>;
-});</pre>
+  <span class="kw">return</span> () =&gt; &lt;<span class="fn">div</span>&gt;Hello&lt;/<span class="fn">div</span>&gt;;
+});</code></pre>
+          </div>
         </div>
-      </div>
 
-      <!-- Ref demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">ref() — DOM access</span>
-          <span class="demo-card-badge badge-component">LIVE</span>
-        </div>
-        <div class="demo-preview" id="ref-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> C = <span class="fn">component</span>(() =&gt; {
+        <!-- Ref demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">ref() — DOM access</span>
+            <span class="demo-card-badge badge-component">LIVE</span>
+          </div>
+          <div class="demo-preview" id="ref-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> C = <span class="fn">component</span>(() =&gt; {
   <span class="kw">const</span> inputRef = <span class="fn">ref</span>();
 
   <span class="fn">onMount</span>(() =&gt; {
@@ -762,53 +1198,54 @@
     inputRef.current.focus();
   });
 
-  <span class="kw">return</span> () =&gt; html<span class="str">`
-    &lt;input ref=</span>${inputRef}<span class="str"> placeholder="..." /&gt;
-  `</span>;
-});</pre>
+  <span class="kw">return</span> () =&gt; (
+    &lt;<span class="fn">input</span> <span class="pn">ref</span>={inputRef} <span class="pn">placeholder</span>=<span class="str">"..."</span> /&gt;
+  );
+});</code></pre>
+          </div>
         </div>
-      </div>
 
-      <!-- el.* hyperscript demo -->
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">el.* — no-build hyperscript</span>
-          <span class="demo-card-badge badge-component">LIVE</span>
-        </div>
-        <div class="demo-preview" id="el-preview"></div>
-        <div class="demo-code">
-          <pre><span class="cm">// el.* is a Proxy over h()</span>
+        <!-- el.* hyperscript demo -->
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">el.* — no-build hyperscript</span>
+            <span class="demo-card-badge badge-component">LIVE</span>
+          </div>
+          <div class="demo-preview" id="el-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="cm">// el.* is a Proxy over h()</span>
 <span class="cm">// props auto-detected — no null needed</span>
 el.div(
   el.h2(<span class="str">'Hello'</span>),
   el.p({ class: <span class="str">'note'</span> }, <span class="str">'Works in script tags'</span>),
   el.button({ onclick: fn }, <span class="str">'Click me'</span>),
-)</pre>
+)</code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Router ────────────────────────────────────────────────────────────── -->
-<section class="section" id="router">
-  <div class="container">
-    <div class="section-label">Client-side routing</div>
-    <h2 class="section-title">Built-in Router</h2>
-    <p class="section-desc">
-      <code style="color:var(--accent)">createRouter()</code> returns a component that re-renders reactively on navigation.
-      Route params are signals. Zero dependencies.
-    </p>
+  <!-- ─── Router ────────────────────────────────────────────────────────────── -->
+  <section class="section" id="router">
+    <div class="container">
+      <div class="section-label">Client-side routing</div>
+      <h2 class="section-title">Built-in Router</h2>
+      <p class="section-desc">
+        <code style="color:var(--accent)">createRouter()</code> returns a component that re-renders reactively on
+        navigation.
+        Route params are signals. Zero dependencies.
+      </p>
 
-    <div class="demo-grid cols-1">
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">createRouter() + navigate() + Link + params()</span>
-          <span class="demo-card-badge badge-router">LIVE</span>
-        </div>
-        <div class="demo-preview" id="router-preview" style="padding:0"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> App = <span class="fn">createRouter</span>([
+      <div class="demo-grid cols-1">
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">createRouter() + navigate() + Link + params()</span>
+            <span class="demo-card-badge badge-router">LIVE</span>
+          </div>
+          <div class="demo-preview" id="router-preview" style="padding:0"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> App = <span class="fn">createRouter</span>([
   { path: <span class="str">'/'</span>,           component: Home },
   { path: <span class="str">'/blog/:slug'</span>, component: BlogPost },
   { path: <span class="str">'*'</span>,           component: NotFound },
@@ -825,172 +1262,191 @@ el.div(
 
 <span class="cm">// Query string</span>
 <span class="fn">navigate</span>(<span class="str">'/search?q=actjs'</span>);
-<span class="kw">const</span> q = <span class="fn">query</span>(); <span class="cm">// { q: 'actjs' }</span></pre>
+<span class="kw">const</span> q = <span class="fn">query</span>(); <span class="cm">// { q: 'actjs' }</span></code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Resource + Suspense ──────────────────────────────────────────────── -->
-<section class="section" id="resource">
-  <div class="container">
-    <div class="section-label">Async data</div>
-    <h2 class="section-title">resource() + Suspense</h2>
-    <p class="section-desc">
-      Async data loading with built-in loading and error states.
-      On the server, data is awaited before streaming. On the client, the component re-renders when data arrives.
-    </p>
+  <!-- ─── Resource + Suspense ──────────────────────────────────────────────── -->
+  <section class="section" id="resource">
+    <div class="container">
+      <div class="section-label">Async data</div>
+      <h2 class="section-title">resource() + Suspense</h2>
+      <p class="section-desc">
+        Async data loading with built-in loading and error states.
+        On the server, data is awaited before streaming. On the client, the component re-renders when data arrives.
+      </p>
 
-    <div class="demo-grid">
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">resource() — async fetch</span>
-          <span class="demo-card-badge badge-resource">LIVE</span>
-        </div>
-        <div class="demo-preview" id="resource-preview"></div>
-        <div class="demo-code">
-          <pre><span class="kw">const</span> posts = <span class="fn">resource</span>(() =&gt;
+      <div class="demo-grid">
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">resource() — async fetch</span>
+            <span class="demo-card-badge badge-resource">LIVE</span>
+          </div>
+          <div class="demo-preview" id="resource-preview"></div>
+          <div class="demo-code">
+            <pre><code><span class="kw">const</span> posts = <span class="fn">resource</span>(() =&gt;
   <span class="fn">fetch</span>(<span class="str">'/api/posts'</span>).<span class="fn">then</span>(r =&gt; r.<span class="fn">json</span>())
 );
 
 <span class="kw">return</span> () =&gt; posts.<span class="fn">loading</span>()
-  ? html<span class="str">`&lt;div&gt;Loading...&lt;/div&gt;`</span>
+  ? &lt;<span class="fn">div</span>&gt;Loading...&lt;/<span class="fn">div</span>&gt;
   : posts.<span class="fn">error</span>()
-  ? html<span class="str">`&lt;p&gt;Error!&lt;/p&gt;`</span>
-  : html<span class="str">`&lt;ul&gt;</span>${posts().<span class="fn">map</span>(renderPost)}<span class="str">&lt;/ul&gt;`</span>;</pre>
-        </div>
-      </div>
-
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">Suspense — streaming boundary</span>
-          <span class="demo-card-badge badge-resource">SSR</span>
-        </div>
-        <div class="demo-preview" id="suspense-preview">
-          <div class="d-muted" style="font-size:0.85rem;margin-bottom:0.75rem">
-            On the server, Suspense streams fallback HTML immediately, then swaps to the real content as async data resolves.
+  ? &lt;<span class="fn">p</span>&gt;Error!&lt;/<span class="fn">p</span>&gt;
+  : &lt;<span class="fn">ul</span>&gt;<span class="pn">{</span>posts().<span class="fn">map</span>(renderPost)<span class="pn">}</span>&lt;/<span class="fn">ul</span>&gt;;</code></pre>
           </div>
-          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
-            <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:0.75rem;color:var(--muted)">SSR stream</div>
-            <div style="padding:1rem">
-              <div style="color:var(--green);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:0.4rem">&rarr; streams immediately:</div>
-              <div style="background:var(--bg);border-radius:4px;padding:0.5rem 0.75rem;font-family:var(--font-mono);font-size:0.78rem;margin-bottom:0.75rem;color:var(--muted)">&lt;div class="skeleton"&gt;Loading...&lt;/div&gt;</div>
-              <div style="color:var(--accent);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:0.4rem">&rarr; swaps when resolved:</div>
-              <div style="background:var(--bg);border-radius:4px;padding:0.5rem 0.75rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--muted)">&lt;PostList posts={[...]} /&gt;</div>
+        </div>
+
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">Suspense — streaming boundary</span>
+            <span class="demo-card-badge badge-resource">SSR</span>
+          </div>
+          <div class="demo-preview" id="suspense-preview">
+            <div class="d-muted" style="font-size:0.85rem;margin-bottom:0.75rem">
+              On the server, Suspense streams fallback HTML immediately, then swaps to the real content as async data
+              resolves.
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <div
+                style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:0.75rem;color:var(--muted)">
+                SSR stream</div>
+              <div style="padding:1rem">
+                <div style="color:var(--green);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:0.4rem">
+                  &rarr; streams immediately:</div>
+                <div
+                  style="background:var(--bg);border-radius:4px;padding:0.5rem 0.75rem;font-family:var(--font-mono);font-size:0.78rem;margin-bottom:0.75rem;color:var(--muted)">
+                  &lt;div class="skeleton"&gt;Loading...&lt;/div&gt;</div>
+                <div style="color:var(--accent);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:0.4rem">
+                  &rarr; swaps when resolved:</div>
+                <div
+                  style="background:var(--bg);border-radius:4px;padding:0.5rem 0.75rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--muted)">
+                  &lt;PostList posts={[...]} /&gt;</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="demo-code">
-          <pre><span class="cm">// SSR: streams fallback immediately,</span>
+          <div class="demo-code">
+            <pre><code><span class="cm">// SSR: streams fallback immediately,</span>
 <span class="cm">// swaps content when data resolves</span>
 &lt;<span class="fn">Suspense</span> <span class="pn">fallback</span>={&lt;<span class="fn">div</span>&gt;Loading...&lt;/<span class="fn">div</span>&gt;}&gt;
   &lt;<span class="fn">PostList</span> <span class="pn">posts</span>={posts} /&gt;
-&lt;/<span class="fn">Suspense</span>&gt;</pre>
+&lt;/<span class="fn">Suspense</span>&gt;</code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Island hydration ──────────────────────────────────────────────────── -->
-<section class="section" id="ssr">
-  <div class="container">
-    <div class="section-label">Island architecture</div>
-    <h2 class="section-title">SSR + Island Hydration</h2>
-    <p class="section-desc">
-      Each component declares its own hydration strategy. Static components ship zero JS.
-      Interactive islands hydrate on load. Visible islands hydrate when scrolled into view.
-    </p>
-
-    <div class="island-grid">
-      <div class="island-card">
-        <div class="island-icon" style="background:rgba(107,107,128,0.15)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b6b80" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-        </div>
-        <h3>Static</h3>
-        <p>Renders to pure HTML on the server. Zero JavaScript shipped. Perfect for headers, footers, marketing copy.</p>
-        <code>hydrate: 'static'</code>
-      </div>
-      <div class="island-card">
-        <div class="island-icon" style="background:rgba(201,255,51,0.1)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9ff33" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <h3>Interactive</h3>
-        <p>Hydrates immediately on page load. Best for above-the-fold widgets that need to be interactive right away.</p>
-        <code>hydrate: 'interactive'</code>
-      </div>
-      <div class="island-card">
-        <div class="island-icon" style="background:rgba(51,170,255,0.1)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#33aaff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        </div>
-        <h3>Visible</h3>
-        <p>Hydrates only when scrolled into view using IntersectionObserver. Best for LCP — skips JS for off-screen content.</p>
-        <code>hydrate: 'visible'</code>
-      </div>
-    </div>
-
-    <div class="callout" style="margin-top:2rem">
-      <p>
-        Use <code>renderToString(component)</code> from <code>actjs/server</code> for SSR.
-        On the client, pass <code>{ hydrate: true }</code> to <code>createApp()</code> to adopt
-        the server-rendered DOM without clearing it — bots see full HTML, users get a reactive island.
+  <!-- ─── Island hydration ──────────────────────────────────────────────────── -->
+  <section class="section" id="ssr">
+    <div class="container">
+      <div class="section-label">Island architecture</div>
+      <h2 class="section-title">SSR + Island Hydration</h2>
+      <p class="section-desc">
+        Each component declares its own hydration strategy. Static components ship zero JS.
+        Interactive islands hydrate on load. Visible islands hydrate when scrolled into view.
       </p>
-    </div>
 
-    <div class="demo-grid" style="margin-top:2rem">
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">SSR usage</span>
-          <span class="demo-card-badge badge-component">SERVER</span>
+      <div class="island-grid">
+        <div class="island-card">
+          <div class="island-icon" style="background:rgba(107,107,128,0.15)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b6b80" stroke-width="2">
+              <path d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
+          </div>
+          <h3>Static</h3>
+          <p>Renders to pure HTML on the server. Zero JavaScript shipped. Perfect for headers, footers, marketing copy.
+          </p>
+          <code>hydrate: 'static'</code>
         </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="cm">// actjs/server subpath</span>
+        <div class="island-card">
+          <div class="island-icon" style="background:rgba(201,255,51,0.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9ff33" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+          </div>
+          <h3>Interactive</h3>
+          <p>Hydrates immediately on page load. Best for above-the-fold widgets that need to be interactive right away.
+          </p>
+          <code>hydrate: 'interactive'</code>
+        </div>
+        <div class="island-card">
+          <div class="island-icon" style="background:rgba(51,170,255,0.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#33aaff" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4l3 3" />
+            </svg>
+          </div>
+          <h3>Visible</h3>
+          <p>Hydrates only when scrolled into view using IntersectionObserver. Best for LCP — skips JS for off-screen
+            content.</p>
+          <code>hydrate: 'visible'</code>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:2rem">
+        <p>
+          Use <code>renderToString(component)</code> from <code>actjs/server</code> for SSR.
+          On the client, pass <code>{ hydrate: true }</code> to <code>createApp()</code> to adopt
+          the server-rendered DOM without clearing it — bots see full HTML, users get a reactive island.
+        </p>
+      </div>
+
+      <div class="demo-grid" style="margin-top:2rem">
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">SSR usage</span>
+            <span class="demo-card-badge badge-component">SERVER</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="cm">// actjs/server subpath</span>
 <span class="kw">import</span> { renderToString } <span class="kw">from</span> <span class="str">'actjs/server'</span>;
 
 <span class="kw">const</span> html = <span class="kw">await</span> <span class="fn">renderToString</span>(MyPage);
 res.<span class="fn">send</span>(<span class="str">`&lt;!DOCTYPE html&gt;
-&lt;html&gt;&lt;body&gt;</span>${html}<span class="str">&lt;/body&gt;&lt;/html&gt;`</span>);</pre>
+&lt;html&gt;&lt;body&gt;</span>${html}<span class="str">&lt;/body&gt;&lt;/html&gt;`</span>);</code></pre>
+          </div>
         </div>
-      </div>
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">Client hydration</span>
-          <span class="demo-card-badge badge-component">CLIENT</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="cm">// Adopt SSR DOM — don't clear it</span>
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">Client hydration</span>
+            <span class="demo-card-badge badge-component">CLIENT</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="cm">// Adopt SSR DOM — don't clear it</span>
 <span class="fn">createApp</span>(<span class="str">'#root'</span>, { hydrate: <span class="kw">true</span> })
   .<span class="fn">mount</span>(MyPage);
 
 <span class="cm">// static island — zero JS shipped</span>
 <span class="kw">const</span> Header = <span class="fn">component</span>(() =&gt; () =&gt; ...,
   { hydrate: <span class="str">'static'</span> }
-);</pre>
+);</code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── JSX + html template ──────────────────────────────────────────────── -->
-<section class="section" id="jsx">
-  <div class="container">
-    <div class="section-label">Template options</div>
-    <h2 class="section-title">JSX, el.*, and html``</h2>
-    <p class="section-desc">
-      Three ways to write templates — pick what fits your stack.
-      All produce real DOM nodes directly. No virtual DOM involved.
-    </p>
+  <!-- ─── JSX + html template ──────────────────────────────────────────────── -->
+  <section class="section" id="jsx">
+    <div class="container">
+      <div class="section-label">Template options</div>
+      <h2 class="section-title">JSX, el.*, and html``</h2>
+      <p class="section-desc">
+        Three ways to write templates — pick what fits your stack.
+        All produce real DOM nodes directly. No virtual DOM involved.
+      </p>
 
-    <div class="demo-grid cols-3">
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">JSX (TypeScript)</span>
-          <span class="demo-card-badge badge-component">BUILD</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="cm">// tsconfig.json</span>
+      <div class="demo-grid cols-3">
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">JSX (TypeScript)</span>
+            <span class="demo-card-badge badge-component">BUILD</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="cm">// tsconfig.json</span>
 <span class="str">"jsx"</span>: <span class="str">"react-jsx"</span>,
 <span class="str">"jsxImportSource"</span>: <span class="str">"actjs"</span>
 
@@ -1000,31 +1456,31 @@ res.<span class="fn">send</span>(<span class="str">`&lt;!DOCTYPE html&gt;
     &lt;h2&gt;{title()}&lt;/h2&gt;
     &lt;p&gt;{body}&lt;/p&gt;
   &lt;/div&gt;
-);</pre>
+);</code></pre>
+          </div>
         </div>
-      </div>
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">el.* (no build)</span>
-          <span class="demo-card-badge badge-signal">IIFE</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="cm">// Proxy over h() — works in</span>
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">el.* (no build)</span>
+            <span class="demo-card-badge badge-signal">IIFE</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="cm">// Proxy over h() — works in</span>
 <span class="cm">// plain &lt;script&gt; tags</span>
 <span class="kw">return</span> () =&gt;
   el.div({ class: <span class="str">'card'</span> },
     el.h2(title()),
     el.p(body),
-  );</pre>
+  );</code></pre>
+          </div>
         </div>
-      </div>
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">html`` (tagged template)</span>
-          <span class="demo-card-badge badge-computed">ESM</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="cm">// Tagged template → Element (no build)</span>
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">html`` (tagged template)</span>
+            <span class="demo-card-badge badge-computed">ESM</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="cm">// Tagged template → Element (no build)</span>
 <span class="cm">// Functions wire as event listeners</span>
 <span class="kw">return</span> () =&gt; html<span class="str">`
   &lt;div class="card"&gt;
@@ -1033,31 +1489,32 @@ res.<span class="fn">send</span>(<span class="str">`&lt;!DOCTYPE html&gt;
       Click
     &lt;/button&gt;
   &lt;/div&gt;
-`</span>;</pre>
+`</span>;</code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── useHead ────────────────────────────────────────────────────────────── -->
-<section class="section" id="head">
-  <div class="container">
-    <div class="section-label">SEO</div>
-    <h2 class="section-title">useHead — SSR-aware Head Management</h2>
-    <p class="section-desc">
-      Set document title and meta tags from inside any component.
-      On the server they're injected into the HTML stream. On the client they update <code>&lt;head&gt;</code> in place.
-    </p>
+  <!-- ─── useHead ────────────────────────────────────────────────────────────── -->
+  <section class="section" id="head">
+    <div class="container">
+      <div class="section-label">SEO</div>
+      <h2 class="section-title">useHead — SSR-aware Head Management</h2>
+      <p class="section-desc">
+        Set document title and meta tags from inside any component.
+        On the server they're injected into the HTML stream. On the client they update <code>&lt;head&gt;</code> in
+        place.
+      </p>
 
-    <div class="demo-grid cols-1">
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">useHead()</span>
-          <span class="demo-card-badge badge-lifecycle">SSR + CLIENT</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="kw">const</span> BlogPost = <span class="fn">component</span>(() =&gt; {
+      <div class="demo-grid cols-1">
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">useHead()</span>
+            <span class="demo-card-badge badge-lifecycle">SSR + CLIENT</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="kw">const</span> BlogPost = <span class="fn">component</span>(() =&gt; {
   <span class="kw">const</span> [title, setTitle] = <span class="fn">signal</span>(<span class="str">'My Post'</span>);
 
   <span class="cm">// Reactive — updates &lt;title&gt; when title() changes</span>
@@ -1072,32 +1529,32 @@ res.<span class="fn">send</span>(<span class="str">`&lt;!DOCTYPE html&gt;
     ],
   });
 
-  <span class="kw">return</span> () =&gt; html<span class="str">`&lt;article&gt;</span>${title()}<span class="str">&lt;/article&gt;`</span>;
-});</pre>
+  <span class="kw">return</span> () =&gt; &lt;<span class="fn">article</span>&gt;<span class="pn">{</span>title()<span class="pn">}</span>&lt;/<span class="fn">article</span>&gt;;
+});</code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── App API ────────────────────────────────────────────────────────────── -->
-<section class="section" id="app-api">
-  <div class="container">
-    <div class="section-label">App lifecycle</div>
-    <h2 class="section-title">createApp() — App Orchestrator</h2>
-    <p class="section-desc">
-      Mount components, inject CSS, run safe timers that auto-clear on destroy.
-      Multiple independent apps on one page — each is isolated.
-    </p>
+  <!-- ─── App API ────────────────────────────────────────────────────────────── -->
+  <section class="section" id="app-api">
+    <div class="container">
+      <div class="section-label">App lifecycle</div>
+      <h2 class="section-title">createApp() — App Orchestrator</h2>
+      <p class="section-desc">
+        Mount components, inject CSS, run safe timers that auto-clear on destroy.
+        Multiple independent apps on one page — each is isolated.
+      </p>
 
-    <div class="demo-grid">
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">createApp()</span>
-          <span class="demo-card-badge badge-component">API</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="kw">const</span> app = <span class="fn">createApp</span>(<span class="str">'#root'</span>);
+      <div class="demo-grid">
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">createApp()</span>
+            <span class="demo-card-badge badge-component">API</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="kw">const</span> app = <span class="fn">createApp</span>(<span class="str">'#root'</span>);
 
 <span class="cm">// Mount component</span>
 app.<span class="fn">mount</span>(Counter);
@@ -1110,118 +1567,267 @@ app.<span class="fn">criticalStylesheet</span>(<span class="str">'/app.css'</spa
 app.<span class="fn">safeSetInterval</span>(tick, <span class="num">1000</span>);
 
 <span class="cm">// Cleanup everything</span>
-app.<span class="fn">destroy</span>();</pre>
+app.<span class="fn">destroy</span>();</code></pre>
+          </div>
         </div>
-      </div>
-      <div class="demo-card">
-        <div class="demo-card-header">
-          <span class="demo-card-title">Multiple islands per page</span>
-          <span class="demo-card-badge badge-component">PATTERN</span>
-        </div>
-        <div class="demo-code" style="border-top:none">
-          <pre><span class="cm">// Each island is independent</span>
+        <div class="demo-card">
+          <div class="demo-card-header">
+            <span class="demo-card-title">Multiple islands per page</span>
+            <span class="demo-card-badge badge-component">PATTERN</span>
+          </div>
+          <div class="demo-code" style="border-top:none">
+            <pre><code><span class="cm">// Each island is independent</span>
 <span class="fn">createApp</span>(<span class="str">'#cart'</span>).<span class="fn">mount</span>(Cart);
 <span class="fn">createApp</span>(<span class="str">'#search'</span>).<span class="fn">mount</span>(SearchBar);
 <span class="fn">createApp</span>(<span class="str">'#newsletter'</span>).<span class="fn">mount</span>(Newsletter);
 
 <span class="cm">// SSR hydration — adopt server DOM</span>
 <span class="fn">createApp</span>(<span class="str">'#root'</span>, { hydrate: <span class="kw">true</span> })
-  .<span class="fn">mount</span>(App);</pre>
+  .<span class="fn">mount</span>(App);</code></pre>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── API Reference ─────────────────────────────────────────────────────── -->
-<section class="section" id="api">
-  <div class="container">
-    <div class="section-label">Reference</div>
-    <h2 class="section-title">Full API</h2>
-    <p class="section-desc" style="margin-bottom:2rem">Every export from the <code>actjs</code> package.</p>
+  <!-- ─── API Reference ─────────────────────────────────────────────────────── -->
+  <section class="section" id="api">
+    <div class="container">
+      <div class="section-label">Reference</div>
+      <h2 class="section-title">Full API</h2>
+      <p class="section-desc" style="margin-bottom:2rem">Every export from the <code>actjs</code> package.</p>
 
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
-      <table class="api-table">
-        <thead>
-          <tr>
-            <th>Export</th>
-            <th>Module</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>signal(init)</td><td><span class="d-tag orange">actjs</span></td><td>Fine-grained reactive value. Returns [getter, setter].</td></tr>
-          <tr><td>computed(fn)</td><td><span class="d-tag orange">actjs</span></td><td>Derived signal. Lazy, auto-tracks dependencies.</td></tr>
-          <tr><td>globalSignal(key, init)</td><td><span class="d-tag orange">actjs</span></td><td>Keyed singleton signal — shared across all callers with same key.</td></tr>
-          <tr><td>component(setup, opts?)</td><td><span class="d-tag orange">actjs</span></td><td>Define a stateful component. Setup runs once; render re-runs on signal change.</td></tr>
-          <tr><td>defineComponent</td><td><span class="d-tag orange">actjs</span></td><td>Alias for component().</td></tr>
-          <tr><td>onInit(fn)</td><td><span class="d-tag orange">actjs</span></td><td>Lifecycle — runs on server AND client during setup.</td></tr>
-          <tr><td>onMount(fn)</td><td><span class="d-tag orange">actjs</span></td><td>Lifecycle — client only, after first render.</td></tr>
-          <tr><td>onDestroy(fn)</td><td><span class="d-tag orange">actjs</span></td><td>Lifecycle — client only, on app.destroy().</td></tr>
-          <tr><td>useHead(config)</td><td><span class="d-tag orange">actjs</span></td><td>Set title, meta, link tags. SSR streams them; client patches &lt;head&gt;.</td></tr>
-          <tr><td>resource(fn)</td><td><span class="d-tag orange">actjs</span></td><td>Async data source. Reactive — re-fetches when signal deps change.</td></tr>
-          <tr><td>Suspense</td><td><span class="d-tag orange">actjs</span></td><td>Streaming boundary. Shows fallback while resource() loads.</td></tr>
-          <tr><td>h(tag, props, ...children)</td><td><span class="d-tag orange">actjs</span></td><td>Core hyperscript. String tag → DOM element; function → component call.</td></tr>
-          <tr><td>el.*</td><td><span class="d-tag orange">actjs</span></td><td>Proxy sugar: el.button(...) === h('button', ...).</td></tr>
-          <tr><td>Fragment</td><td><span class="d-tag orange">actjs</span></td><td>&lt;&gt;&lt;/&gt; in JSX. Returns DocumentFragment.</td></tr>
-          <tr><td>ref()</td><td><span class="d-tag orange">actjs</span></td><td>Returns { current: null }. Populated by h() after render.</td></tr>
-          <tr><td>html``</td><td><span class="d-tag orange">actjs</span></td><td>Tagged template → DocumentFragment. Functions auto-bind as listeners.</td></tr>
-          <tr><td>createApp(sel, opts?)</td><td><span class="d-tag orange">actjs</span></td><td>App factory. mount(), destroy(), criticalCSS, safe timers.</td></tr>
-          <tr><td>createRouter(routes, opts?)</td><td><span class="d-tag orange">actjs</span></td><td>Component factory that renders matched route reactively.</td></tr>
-          <tr><td>navigate(to)</td><td><span class="d-tag orange">actjs</span></td><td>Programmatic navigation. Updates path signal + history.</td></tr>
-          <tr><td>Link(props)</td><td><span class="d-tag orange">actjs</span></td><td>Declarative &lt;a&gt; that calls navigate() on click.</td></tr>
-          <tr><td>currentPath()</td><td><span class="d-tag orange">actjs</span></td><td>Reactive getter for current pathname.</td></tr>
-          <tr><td>params()</td><td><span class="d-tag orange">actjs</span></td><td>Reactive getter for current route params: { slug: 'hello' }.</td></tr>
-          <tr><td>query()</td><td><span class="d-tag orange">actjs</span></td><td>Reactive getter for URL query string as key-value map.</td></tr>
-          <tr><td>matchRoute(pattern, path)</td><td><span class="d-tag orange">actjs</span></td><td>Match a route pattern. Returns params or null.</td></tr>
-          <tr><td>renderToString(component)</td><td><span class="d-tag purple">actjs/server</span></td><td>SSR — returns HTML string. Awaits resource() calls.</td></tr>
-        </tbody>
-      </table>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Export</th>
+              <th>Module</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>signal(init)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Fine-grained reactive value. Returns [getter, setter].</td>
+            </tr>
+            <tr>
+              <td>computed(fn)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Derived signal. Lazy, auto-tracks dependencies.</td>
+            </tr>
+            <tr>
+              <td>globalSignal(key, init)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Keyed singleton signal — shared across all callers with same key.</td>
+            </tr>
+            <tr>
+              <td>component(setup, opts?)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Define a stateful component. Setup runs once; render re-runs on signal change.</td>
+            </tr>
+            <tr>
+              <td>defineComponent</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Alias for component().</td>
+            </tr>
+            <tr>
+              <td>onInit(fn)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Lifecycle — runs on server AND client during setup.</td>
+            </tr>
+            <tr>
+              <td>onMount(fn)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Lifecycle — client only, after first render.</td>
+            </tr>
+            <tr>
+              <td>onDestroy(fn)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Lifecycle — client only, on app.destroy().</td>
+            </tr>
+            <tr>
+              <td>useHead(config)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Set title, meta, link tags. SSR streams them; client patches &lt;head&gt;.</td>
+            </tr>
+            <tr>
+              <td>resource(fn)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Async data source. Reactive — re-fetches when signal deps change.</td>
+            </tr>
+            <tr>
+              <td>Suspense</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Streaming boundary. Shows fallback while resource() loads.</td>
+            </tr>
+            <tr>
+              <td>h(tag, props, ...children)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Core hyperscript. String tag → DOM element; function → component call.</td>
+            </tr>
+            <tr>
+              <td>el.*</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Proxy sugar: el.button(...) === h('button', ...).</td>
+            </tr>
+            <tr>
+              <td>Fragment</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>&lt;&gt;&lt;/&gt; in JSX. Returns DocumentFragment.</td>
+            </tr>
+            <tr>
+              <td>ref()</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Returns { current: null }. Populated by h() after render.</td>
+            </tr>
+            <tr>
+              <td>html``</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Tagged template → DocumentFragment. Functions auto-bind as listeners.</td>
+            </tr>
+            <tr>
+              <td>createApp(sel, opts?)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>App factory. mount(), destroy(), criticalCSS, safe timers.</td>
+            </tr>
+            <tr>
+              <td>createRouter(routes, opts?)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Component factory that renders matched route reactively.</td>
+            </tr>
+            <tr>
+              <td>navigate(to)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Programmatic navigation. Updates path signal + history.</td>
+            </tr>
+            <tr>
+              <td>Link(props)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Declarative &lt;a&gt; that calls navigate() on click.</td>
+            </tr>
+            <tr>
+              <td>currentPath()</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Reactive getter for current pathname.</td>
+            </tr>
+            <tr>
+              <td>params()</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Reactive getter for current route params: { slug: 'hello' }.</td>
+            </tr>
+            <tr>
+              <td>query()</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Reactive getter for URL query string as key-value map.</td>
+            </tr>
+            <tr>
+              <td>matchRoute(pattern, path)</td>
+              <td><span class="d-tag orange">actjs</span></td>
+              <td>Match a route pattern. Returns params or null.</td>
+            </tr>
+            <tr>
+              <td>renderToString(component)</td>
+              <td><span class="d-tag purple">actjs/server</span></td>
+              <td>SSR — returns HTML string. Awaits resource() calls.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Comparison ────────────────────────────────────────────────────────── -->
-<section class="section" id="compare">
-  <div class="container">
-    <div class="section-label">Why actjs</div>
-    <h2 class="section-title">How it stacks up</h2>
+  <!-- ─── Comparison ────────────────────────────────────────────────────────── -->
+  <section class="section" id="compare">
+    <div class="container">
+      <div class="section-label">Why actjs</div>
+      <h2 class="section-title">How it stacks up</h2>
 
-    <div style="overflow-x:auto;margin-top:2rem">
-      <table class="cmp-table">
-        <thead>
-          <tr>
-            <th style="text-align:left">Feature</th>
-            <th class="cmp-col-act">actjs</th>
-            <th>React</th>
-            <th>Vue</th>
-            <th>Svelte</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Fine-grained signals</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td></tr>
-          <tr><td>No virtual DOM</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-no">No</td><td class="cmp-yes">Yes</td></tr>
-          <tr><td>Works in &lt;script&gt; tags (IIFE)</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-no">Partial</td><td class="cmp-no">No</td></tr>
-          <tr><td>Per-component hydration strategy</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-no">No</td><td class="cmp-no">No</td></tr>
-          <tr><td>Built-in router</td><td class="cmp-yes">Yes</td><td class="cmp-no">External</td><td class="cmp-no">External</td><td class="cmp-no">External</td></tr>
-          <tr><td>JSX support</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td></tr>
-          <tr><td>Zero runtime dependencies</td><td class="cmp-yes">Yes</td><td class="cmp-no">No</td><td class="cmp-no">No</td><td class="cmp-yes">Yes</td></tr>
-          <tr><td>SSR + streaming</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td><td class="cmp-yes">Yes</td></tr>
-        </tbody>
-      </table>
+      <div style="overflow-x:auto;margin-top:2rem">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Feature</th>
+              <th class="cmp-col-act">actjs</th>
+              <th>React</th>
+              <th>Vue</th>
+              <th>Svelte</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fine-grained signals</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+            </tr>
+            <tr>
+              <td>No virtual DOM</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-yes">Yes</td>
+            </tr>
+            <tr>
+              <td>Works in &lt;script&gt; tags (IIFE)</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-no">Partial</td>
+              <td class="cmp-no">No</td>
+            </tr>
+            <tr>
+              <td>Per-component hydration strategy</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-no">No</td>
+            </tr>
+            <tr>
+              <td>Built-in router</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-no">External</td>
+              <td class="cmp-no">External</td>
+              <td class="cmp-no">External</td>
+            </tr>
+            <tr>
+              <td>JSX support</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+            </tr>
+            <tr>
+              <td>Zero runtime dependencies</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-no">No</td>
+              <td class="cmp-yes">Yes</td>
+            </tr>
+            <tr>
+              <td>SSR + streaming</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+              <td class="cmp-yes">Yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── Footer ────────────────────────────────────────────────────────────── -->
-<footer>
-  <div class="container">
-    <div class="logo">actjs</div>
-    <p>Reactive UI without the runtime. MIT License.</p>
-  </div>
-</footer>
+  <!-- ─── Footer ────────────────────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="logo">actjs</div>
+      <p>Reactive UI without the runtime. MIT License.</p>
+    </div>
+  </footer>
 
-<!-- ─── actjs module entry ──────────────────────────────────────────────────── -->
-<script type="module" src="./main.tsx"></script>
+  <!-- ─── actjs module entry ──────────────────────────────────────────────────── -->
+  <script type="module" src="./main.tsx"></script>
 </body>
+
 </html>

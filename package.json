@@ -6,39 +6,49 @@
   "main": "./dist/actjs.cjs.js",
   "module": "./dist/actjs.esm.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "actjs-dev": "./bin/actjs-dev.js"
+  },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/actjs.esm.js",
-      "require": "./dist/actjs.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/actjs.cjs.js"
     },
     "./jsx-runtime": {
-      "import": "./dist/jsx-runtime.js",
-      "types": "./dist/jsx-runtime.d.ts"
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js"
     },
     "./server": {
-      "import": "./dist/actjs.server.esm.js",
-      "types": "./dist/server.d.ts"
+      "types": "./dist/server.d.ts",
+      "import": "./dist/actjs.server.esm.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": ["dist", "bin", "README.md", "LICENSE"],
   "unpkg": "./dist/actjs.iife.js",
   "jsdelivr": "./dist/actjs.iife.js",
   "sideEffects": false,
+  "dependencies": {
+    "esbuild": "^0.25.0",
+    "ws": "^8.18.0"
+  },
   "scripts": {
     "build": "vite build && vite build --config vite.iife.config.ts",
+    "build:dev": "node scripts/build-dev.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src tests",
     "format": "prettier --write src tests",
-    "dev:counter": "VITE_EXAMPLE=counter vite --config examples/vite.config.ts",
-    "dev:todo": "VITE_EXAMPLE=todo vite --config examples/vite.config.ts",
-    "dev:blog": "VITE_EXAMPLE=blog vite --config examples/vite.config.ts",
-    "dev:landing": "VITE_EXAMPLE=landing vite --config examples/vite.config.ts"
+    "dev:counter": "node bin/actjs-dev.js --entry examples/counter/index.html --port 3000",
+    "dev:todo": "node bin/actjs-dev.js --entry examples/todo/index.html --port 3001",
+    "dev:blog": "node bin/actjs-dev.js --entry examples/blog/index.html --port 3002",
+    "dev:landing": "node bin/actjs-dev.js --entry examples/landing/index.html --port 3003"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.0",
     "@vitest/coverage-v8": "^2.0.0",
     "happy-dom": "^14.0.0",
     "typescript": "^5.5.0",
