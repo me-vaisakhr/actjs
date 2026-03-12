@@ -43,7 +43,7 @@ export async function runPreview(argv: string[]): Promise<void> {
   const port    = parseInt(values['port'] as string, 10);
 
   if (!fs.existsSync(distDir)) {
-    console.error(`[actjs-dev] Preview dir not found: ${distDir}. Run: actjs-dev build`);
+    console.error(`[actjs] Preview dir not found: ${distDir}. Run: actjs build`);
     process.exit(1);
   }
 
@@ -70,14 +70,14 @@ export async function runPreview(argv: string[]): Promise<void> {
   });
 
   server.listen(port, () => {
-    console.log(`\n  actjs-dev preview  →  http://localhost:${port}\n`);
+    console.log(`\n  actjs preview  →  http://localhost:${port}\n`);
   });
 
   server.on('error', (err: NodeJS.ErrnoException) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`[actjs-dev] Port ${port} is in use. Try: actjs-dev preview --port ${port + 1}`);
+      console.error(`[actjs] Port ${port} is in use. Try: actjs preview --port ${port + 1}`);
     } else {
-      console.error('[actjs-dev] Preview error:', err.message);
+      console.error('[actjs] Preview error:', err.message);
     }
     process.exit(1);
   });
@@ -150,11 +150,11 @@ export async function runBuild(argv: string[]): Promise<void> {
   const assetsDir   = path.join(outDir, 'assets');
 
   if (!fs.existsSync(entryHtml)) {
-    console.error(`[actjs-dev] Entry not found: ${entryHtml}`);
+    console.error(`[actjs] Entry not found: ${entryHtml}`);
     process.exit(1);
   }
 
-  console.log('[actjs-dev] Building...');
+  console.log('[actjs] Building...');
 
   const rawHtml = fs.readFileSync(entryHtml, 'utf-8');
   const match   = MODULE_SCRIPT_RE.exec(rawHtml);
@@ -194,7 +194,7 @@ export async function runBuild(argv: string[]): Promise<void> {
     });
 
     if (result.errors.length > 0) {
-      console.error('[actjs-dev] Build failed');
+      console.error('[actjs] Build failed');
       process.exit(1);
     }
 
@@ -206,7 +206,7 @@ export async function runBuild(argv: string[]): Promise<void> {
     fs.writeFileSync(path.join(outDir, 'index.html'), outHtml, 'utf-8');
   } else {
     // No module script — HTML already copied as-is by copyStaticFiles above
-    console.warn('[actjs-dev] No <script type="module" src="..."> found — copying HTML only.');
+    console.warn('[actjs] No <script type="module" src="..."> found — copying HTML only.');
   }
 
   console.log(`\n  Built to ${path.relative(process.cwd(), outDir)}/\n`);

@@ -23,7 +23,7 @@ export class FileWatcher {
       this.handles.push(handle);
     } catch {
       console.warn(
-        '[actjs-dev] Recursive fs.watch unavailable — falling back to top-level watch.',
+        '[actjs] Recursive fs.watch unavailable — falling back to top-level watch.',
       );
       // Watch only the immediate directory (non-recursive fallback)
       const handle = fs.watch(projectRoot, (_event, filename) =>

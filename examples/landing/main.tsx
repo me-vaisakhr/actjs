@@ -1,5 +1,7 @@
 import { createApp } from 'actjs';
 
+import { ThemeToggle }      from './components/ThemeToggle';
+import { HeroDemo }         from './components/HeroDemo';
 import { SignalCounter }    from './components/SignalCounter';
 import { ComputedDemo }     from './components/ComputedDemo';
 import { TextBind }         from './components/TextBind';
@@ -11,6 +13,8 @@ import { ElDemo }           from './components/ElDemo';
 import { RouterDemo }       from './components/RouterDemo';
 import { ResourceDemo }     from './components/ResourceDemo';
 
+createApp('#theme-toggle-mount').mount(ThemeToggle);
+createApp('#hero-demo').mount(HeroDemo);
 createApp('#signal-counter-preview').mount(SignalCounter);
 createApp('#computed-preview').mount(ComputedDemo);
 createApp('#textbind-preview').mount(TextBind);

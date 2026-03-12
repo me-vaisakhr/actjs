@@ -47,4 +47,4 @@ dist/         # Generated — do not commit
 
 ## Filing issues
 
-Please use [GitHub Issues](https://github.com/vaisakhrkrishnan/actjs/issues) to report bugs or request features. Include a minimal reproduction when possible.
+Please use [GitHub Issues](hhttps://github.com/me-vaisakhr/actjs/issues) to report bugs or request features. Include a minimal reproduction when possible.

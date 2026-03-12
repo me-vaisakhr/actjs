@@ -1,1906 +1,975 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
   <title>actjs — Reactive UI Without the Runtime</title>
+  <meta name="description" content="actjs is an 8 kB SSR-first frontend library with fine-grained signals, explicit subscriptions, and island architecture. Zero runtime dependencies. Works with a script tag or npm." />
+  <meta name="keywords" content="actjs, signals, SSR, island architecture, reactive UI, frontend library, JavaScript, TypeScript" />
+  <meta name="author" content="actjs" />
+  <link rel="canonical" href="https://actjs.dev/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://actjs.dev/" />
+  <meta property="og:title"       content="actjs — Reactive UI Without the Runtime" />
+  <meta property="og:description" content="Fine-grained signals with explicit subscriptions. Island architecture that ships zero JS for static components. SSR-first with streaming support. 8 kB gzipped, zero deps." />
+  <meta property="og:image"       content="https://actjs.dev/og-image.png" />
+  <meta property="og:site_name"   content="actjs" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:url"         content="https://actjs.dev/" />
+  <meta name="twitter:title"       content="actjs — Reactive UI Without the Runtime" />
+  <meta name="twitter:description" content="Fine-grained signals with explicit subscriptions. Island architecture that ships zero JS for static components. 8 kB gzipped." />
+  <meta name="twitter:image"       content="https://actjs.dev/og-image.png" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800;12..96,900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="./style.css" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "actjs",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "description": "An 8 kB SSR-first frontend library with fine-grained signals, explicit subscriptions, and island architecture. Zero runtime dependencies.",
+    "url": "https://actjs.dev/",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "softwareVersion": "1.0.0",
+    "programmingLanguage": "TypeScript"
+  }
+  </script>
+
   <style>
-    /* ─── Reset & Base ──────────────────────────────────────────────────────── */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #0d0d0f;
-      --bg2: #131316;
-      --bg3: #1a1a1f;
-      --border: #262630;
-      --text: #e8e8ef;
-      --muted: #6b6b80;
-      --accent: #c9ff33;
-      --accent2: #7c3aed;
-      --accent3: #f97316;
-      --red: #ff4545;
-      --green: #33ff99;
-      --blue: #33aaff;
-      --font-display: 'Syne', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --font-body: 'DM Sans', sans-serif;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ─── Typography ─────────────────────────────────────────────────────────── */
-    h1,
-    h2,
-    h3,
-    h4 {
-      font-family: var(--font-display);
-      line-height: 1.1;
-    }
-
-    code,
-    pre {
-      font-family: var(--font-mono);
-    }
-
-    /* ─── Layout ─────────────────────────────────────────────────────────────── */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    .section {
-      padding: 5rem 0;
-    }
-
-    .section+.section {
-      border-top: 1px solid var(--border);
-    }
-
-    /* ─── Nav ────────────────────────────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: rgba(13, 13, 15, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-    }
-
-    nav .inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-    }
-
-    .nav-logo {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.25rem;
-      color: var(--accent);
-      text-decoration: none;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: color 0.15s;
-    }
-
-    .nav-links a:hover {
-      color: var(--text);
-    }
-
-    .nav-badge {
-      background: var(--accent);
-      color: #0d0d0f;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
-    }
-
-    /* ─── Hero ───────────────────────────────────────────────────────────────── */
-    .hero {
-      padding: 10rem 0 6rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -40%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 900px;
-      height: 900px;
-      background: radial-gradient(ellipse, rgba(201, 255, 51, 0.06) 0%, transparent 65%);
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 0.35rem 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .hero-eyebrow span {
-      color: var(--accent);
-    }
-
-    .hero h1 {
-      font-size: clamp(3rem, 7vw, 5.5rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.0;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero h1 em {
-      font-style: normal;
-      color: var(--accent);
-    }
-
-    .hero-sub {
-      font-size: 1.2rem;
-      color: var(--muted);
-      max-width: 560px;
-      line-height: 1.7;
-      margin-bottom: 2.5rem;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.7rem 1.4rem;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: none;
-      border: 1px solid transparent;
-      transition: all 0.15s;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #0d0d0f;
-    }
-
-    .btn-primary:hover {
-      background: #d9ff55;
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--border);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--muted);
-      background: var(--bg3);
-    }
-
-    .hero-install {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-top: 2rem;
-    }
-
-    .hero-install code {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      color: var(--accent);
-    }
-
-    .hero-install span {
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-
-    .hero-steps {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-      margin-top: 0.75rem;
-    }
-
-    .hero-steps .step {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .hero-steps .step-n {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .hero-steps code {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      padding: 0.3rem 0.75rem;
-      border-radius: 5px;
-      font-size: 0.8rem;
-      color: var(--text);
-    }
-
-    .hero-steps .step-sep {
-      color: var(--border);
-      font-size: 0.8rem;
-    }
-
-    .hero-steps .step-note {
-      color: var(--muted);
-      font-size: 0.72rem;
-      margin-left: 0.25rem;
-    }
-
-    .hero-dev-note {
-      margin-top: 0.5rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-    }
-
-    .hero-dev-note code {
-      color: var(--muted);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      padding: 0.1rem 0.4rem;
-      border-radius: 3px;
-      font-family: var(--font-mono);
-      font-size: 0.73rem;
-    }
-
-    /* ─── Feature strip ─────────────────────────────────────────────────────── */
-    .features-strip {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 2rem 0;
-      overflow: hidden;
-    }
-
-    .features-strip-inner {
-      display: flex;
-      gap: 3rem;
-      flex-wrap: wrap;
-    }
-
-    .feat-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      color: var(--muted);
-      font-size: 0.875rem;
-      white-space: nowrap;
-    }
-
-    .feat-item .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-
-    /* ─── Section headers ────────────────────────────────────────────────────── */
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    .section-title {
-      font-size: clamp(1.75rem, 3.5vw, 2.75rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem;
-    }
-
-    .section-desc {
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 520px;
-      line-height: 1.7;
-      margin-bottom: 3rem;
-    }
-
-    /* ─── Demo cards ─────────────────────────────────────────────────────────── */
-    .demo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    .demo-grid.cols-1 {
-      grid-template-columns: 1fr;
-    }
-
-    .demo-grid.cols-3 {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    @media (max-width: 768px) {
-
-      .demo-grid,
-      .demo-grid.cols-3 {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .demo-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .demo-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .demo-card-title {
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .demo-card-badge {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    .badge-signal {
-      background: rgba(201, 255, 51, 0.15);
-      color: var(--accent);
-    }
-
-    .badge-computed {
-      background: rgba(124, 58, 237, 0.2);
-      color: #a78bfa;
-    }
-
-    .badge-component {
-      background: rgba(249, 115, 22, 0.15);
-      color: var(--accent3);
-    }
-
-    .badge-router {
-      background: rgba(51, 170, 255, 0.15);
-      color: var(--blue);
-    }
-
-    .badge-lifecycle {
-      background: rgba(51, 255, 153, 0.12);
-      color: var(--green);
-    }
-
-    .badge-resource {
-      background: rgba(255, 69, 69, 0.12);
-      color: var(--red);
-    }
-
-    .badge-live {
-      background: rgba(201, 255, 51, 0.1);
-      color: var(--accent);
-    }
-
-    .demo-preview {
-      padding: 1.5rem 1.25rem;
-      min-height: 100px;
-    }
-
-    .demo-code {
-      padding: 0;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-    }
-
-    .demo-code pre {
-      padding: 1.25rem;
-      font-size: 0.78rem;
-      line-height: 1.65;
-      overflow-x: auto;
-      color: #c8c8d8;
-    }
-
-    /* Syntax colors */
-    .kw {
-      color: #a78bfa;
-    }
-
-    .fn {
-      color: #7dd3fc;
-    }
-
-    .str {
-      color: #86efac;
-    }
-
-    .num {
-      color: #fda4af;
-    }
-
-    .cm {
-      color: #4b4b60;
-      font-style: italic;
-    }
-
-    .pn {
-      color: #fb923c;
-    }
-
-    /* ─── Demo interactive elements ─────────────────────────────────────────── */
-    .d-count {
-      font-family: var(--font-display);
-      font-size: 3.5rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-
-    .d-label {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-    }
-
-    .d-btns {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .d-btn {
-      padding: 0.4rem 0.9rem;
-      border-radius: 5px;
-      border: 1px solid var(--border);
-      background: var(--bg3);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.12s;
-    }
-
-    .d-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .d-btn.green {
-      border-color: rgba(51, 255, 153, 0.3);
-      color: var(--green);
-    }
-
-    .d-btn.green:hover {
-      background: rgba(51, 255, 153, 0.1);
-    }
-
-    .d-btn.red {
-      border-color: rgba(255, 69, 69, 0.3);
-      color: var(--red);
-    }
-
-    .d-btn.red:hover {
-      background: rgba(255, 69, 69, 0.1);
-    }
-
-    .d-btn.accent {
-      border-color: rgba(201, 255, 51, 0.4);
-      color: var(--accent);
-    }
-
-    .d-btn.accent:hover {
-      background: rgba(201, 255, 51, 0.1);
-    }
-
-    .d-btn:disabled {
-      opacity: 0.35;
-      cursor: default;
-    }
-
-    .d-input {
-      width: 100%;
-      padding: 0.5rem 0.8rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.15s;
-      margin-bottom: 0.5rem;
-    }
-
-    .d-input:focus {
-      border-color: var(--accent);
-    }
-
-    .d-value {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--accent);
-      background: rgba(201, 255, 51, 0.07);
-      border: 1px solid rgba(201, 255, 51, 0.15);
-      padding: 0.4rem 0.75rem;
-      border-radius: 5px;
-      margin-top: 0.5rem;
-      word-break: break-all;
-    }
-
-    .d-muted {
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-
-    .d-tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      padding: 0.1rem 0.4rem;
-      border-radius: 3px;
-      margin-right: 0.25rem;
-    }
-
-    .d-tag.orange {
-      background: rgba(249, 115, 22, 0.15);
-      color: var(--accent3);
-    }
-
-    .d-tag.purple {
-      background: rgba(124, 58, 237, 0.15);
-      color: #a78bfa;
-    }
-
-    .d-tag.green {
-      background: rgba(51, 255, 153, 0.1);
-      color: var(--green);
-    }
-
-    /* ─── Todo list demo ─────────────────────────────────────────────────────── */
-    .todo-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-
-    .todo-item:last-child {
-      border-bottom: none;
-    }
-
-    .todo-item input[type=checkbox] {
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    .todo-item.done span {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
-
-    .todo-item .del-btn {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0 0.2rem;
-      transition: color 0.12s;
-    }
-
-    .todo-item .del-btn:hover {
-      color: var(--red);
-    }
-
-    .todo-count {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 0.75rem;
-    }
-
-    /* ─── Router demo ────────────────────────────────────────────────────────── */
-    .router-demo {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .router-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .router-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .router-url {
-      flex: 1;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.25rem 0.6rem;
-    }
-
-    .router-content {
-      padding: 1.25rem;
-      min-height: 100px;
-    }
-
-    .router-nav {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      padding: 0.75rem 1rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .router-link {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--blue);
-      cursor: pointer;
-      text-decoration: underline;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-
-    .router-link:hover {
-      color: var(--accent);
-    }
-
-    /* ─── Lifecycle log ──────────────────────────────────────────────────────── */
-    .lifecycle-log {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.75rem;
-      max-height: 130px;
-      overflow-y: auto;
-      margin-top: 0.75rem;
-    }
-
-    .log-entry {
-      padding: 0.15rem 0;
-    }
-
-    .log-entry .ts {
-      color: var(--muted);
-    }
-
-    .log-init {
-      color: var(--accent);
-    }
-
-    .log-mount {
-      color: var(--green);
-    }
-
-    .log-destroy {
-      color: var(--red);
-    }
-
-    /* ─── Resource/fetch demo ────────────────────────────────────────────────── */
-    .resource-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.75rem 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .resource-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 0.15rem;
-    }
-
-    .resource-meta {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 1rem auto;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* ─── API table ──────────────────────────────────────────────────────────── */
-    .api-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .api-table th,
-    .api-table td {
-      padding: 0.75rem 1rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.875rem;
-    }
-
-    .api-table th {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: var(--bg3);
-    }
-
-    .api-table td:first-child {
-      font-family: var(--font-mono);
-      color: var(--blue);
-      font-size: 0.82rem;
-    }
-
-    .api-table td:last-child {
-      color: var(--muted);
-      font-size: 0.83rem;
-    }
-
-    .api-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* ─── Comparison table ───────────────────────────────────────────────────── */
-    .cmp-table {
-      width: 100%;
-      border-collapse: collapse;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .cmp-table th,
-    .cmp-table td {
-      padding: 0.7rem 1.1rem;
-      text-align: center;
-      font-size: 0.85rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .cmp-table th {
-      background: var(--bg3);
-      font-weight: 600;
-    }
-
-    .cmp-table td:first-child {
-      text-align: left;
-      color: var(--muted);
-    }
-
-    .cmp-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .cmp-yes {
-      color: var(--green);
-      font-weight: 700;
-    }
-
-    .cmp-no {
-      color: var(--muted);
-    }
-
-    .cmp-col-act {
-      color: var(--accent);
-    }
-
-    /* ─── Island strategy cards ──────────────────────────────────────────────── */
-    .island-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .island-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .island-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-    }
-
-    .island-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
-
-    .island-card h3 {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .island-card p {
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.6;
-    }
-
-    .island-card code {
-      display: inline-block;
-      margin-top: 0.75rem;
-      font-size: 0.78rem;
-      color: var(--accent);
-      background: rgba(201, 255, 51, 0.08);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-    }
-
-    /* ─── Quote/callout ─────────────────────────────────────────────────────── */
-    .callout {
-      border-left: 3px solid var(--accent);
-      background: rgba(201, 255, 51, 0.04);
-      padding: 1rem 1.25rem;
-      border-radius: 0 6px 6px 0;
-      margin: 1.5rem 0;
-    }
-
-    .callout p {
-      color: var(--text);
-      font-size: 0.9rem;
-      line-height: 1.7;
-    }
-
-    .callout code {
-      color: var(--accent);
-      background: rgba(201, 255, 51, 0.1);
-      padding: 0.1rem 0.35rem;
-      border-radius: 3px;
-    }
-
-    /* ─── Footer ─────────────────────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 3rem 0;
-      text-align: center;
-    }
-
-    footer .logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    footer p {
-      color: var(--muted);
-      font-size: 0.875rem;
-    }
-
-    /* ─── Transitions ────────────────────────────────────────────────────────── */
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .fade-up {
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .fade-up-2 {
-      animation: fadeUp 0.5s 0.1s ease both;
-    }
-
-    .fade-up-3 {
-      animation: fadeUp 0.5s 0.2s ease both;
-    }
-
-    /* global signal flash */
-    .gs-flash {
-      transition: background 0.15s;
-    }
-
-    .gs-flash.flash-on {
-      background: rgba(201, 255, 51, 0.15) !important;
-    }
+    /* Inline critical above-the-fold reset only */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #06060a; color: #e2e2f2; overflow-x: hidden; }
+    html[data-theme="light"] body { background: #fafafa; color: #111118; }
   </style>
-</head>
 
+  <!-- ⚡ No-flash theme init — must run before first paint -->
+  <script>
+  (function () {
+    var stored = localStorage.getItem('actjs-theme'); // 'dark' | 'light' | 'system' | null
+    var mode = stored || 'system';
+    var resolved = mode === 'system'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : mode;
+    document.documentElement.dataset.theme = resolved;
+    document.documentElement.dataset.themeMode = mode;
+  })();
+  </script>
+</head>
 <body>
 
-  <!-- ─── Navigation ─────────────────────────────────────────────────────── -->
-  <nav>
-    <div class="inner">
-      <a href="#" class="nav-logo">actjs</a>
-      <ul class="nav-links">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════════════════════════════════ -->
+<header role="banner">
+  <nav class="nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo" aria-label="actjs home">act<span>js</span></a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#philosophy">Philosophy</a></li>
         <li><a href="#signals">Signals</a></li>
         <li><a href="#components">Components</a></li>
         <li><a href="#router">Router</a></li>
-        <li><a href="#ssr">SSR</a></li>
+        <li><a href="#async">Async</a></li>
+        <li><a href="#get-started">Get Started</a></li>
         <li><a href="#api">API</a></li>
-        <li><span class="nav-badge">v1.0</span></li>
       </ul>
+
+      <div class="nav-actions">
+        <!-- Theme toggle — actjs globalSignal component -->
+        <div id="theme-toggle-mount"></div>
+
+        <a href="https://github.com/me-vaisakhr/actjs" class="nav-gh" aria-label="View actjs on GitHub" rel="noopener noreferrer" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+        <a href="#get-started" class="nav-cta">Get Started →</a>
+      </div>
     </div>
   </nav>
+</header>
 
-  <!-- ─── Hero ────────────────────────────────────────────────────────────── -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-eyebrow"><span>NEW</span> Client-side router now included</div>
-      <h1 class="fade-up">Reactive UI<br />Without the<br /><em>Runtime.</em></h1>
-      <p class="hero-sub fade-up-2">
-        Fine-grained signals. Zero virtual DOM. SSR-first with island hydration.
-        Ships as ESM, CJS, and a single IIFE script tag. No compiler required.
+<main id="main-content">
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="hero-dot-grid" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <div class="hero-grid">
+    <!-- Left column: copy -->
+    <div class="hero-copy">
+      <div class="hero-badge" aria-label="Status: live signals demo">
+        <span class="hero-badge-dot" aria-hidden="true"></span>
+        v1.0 · SSR-first · 8 kB gzipped
+      </div>
+
+      <h1 class="hero-h1" id="hero-heading">
+        Build Fast.<br/>
+        <span class="hero-h1-accent">Ship Less</span><br/>
+        JavaScript.
+      </h1>
+
+      <p class="hero-sub">
+        Fine-grained signals with explicit subscriptions. Island architecture that ships
+        zero JS for static components. SSR-first with streaming support. Works with a
+        script tag or npm.
       </p>
-      <div class="hero-actions fade-up-3">
-        <a href="#signals" class="btn btn-primary">See it live</a>
-        <a href="#api" class="btn btn-secondary">Full API reference</a>
-      </div>
-      <div class="hero-install">
-        <code>npx actjs create my-app</code>
-        <span>scaffold a new project in seconds</span>
-      </div>
-      <div class="hero-steps">
-        <span class="step"><span class="step-n">1</span><code>npx actjs create my-app</code></span>
-        <span class="step-sep">→</span>
-        <span class="step"><span class="step-n">2</span><code>cd my-app</code></span>
-        <span class="step-sep">→</span>
-        <span class="step"><span class="step-n">3</span><code>npm run build</code><span class="step-note">opens dist/index.html directly</span></span>
-      </div>
-      <p class="hero-dev-note">For hot reload during development: <code>npm run dev</code></p>
-    </div>
-  </section>
 
-  <!-- ─── Feature strip ───────────────────────────────────────────────────── -->
-  <div class="features-strip">
-    <div class="container">
-      <div class="features-strip-inner">
-        <div class="feat-item">
-          <div class="dot"></div>Fine-grained signals
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>Computed derivations
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>No virtual DOM
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>Island hydration
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>Client-side router
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>SSR + streaming
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>JSX support
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>Zero runtime deps
-        </div>
-        <div class="feat-item">
-          <div class="dot"></div>100% test coverage
-        </div>
+      <div class="hero-actions">
+        <a href="#get-started" class="btn-primary">Get Started →</a>
+        <a href="https://github.com/me-vaisakhr/actjs" class="btn-ghost" rel="noopener noreferrer" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+      <div class="hero-install" aria-label="Install command">
+        <code>$ npx actjs create my-app</code>
+        <button
+          type="button"
+          class="hero-copy-btn"
+          aria-label="Copy install command"
+          onclick="(function(btn){navigator.clipboard.writeText('npx actjs create my-app').then(()=>{btn.innerHTML='<svg width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\'><polyline points=\'20 6 9 17 4 12\'></polyline></svg>';btn.style.color='var(--green)';setTimeout(()=>{btn.innerHTML='<svg width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\'><rect x=\'9\' y=\'9\' width=\'13\' height=\'13\' rx=\'2\' ry=\'2\'></rect><path d=\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\'></path></svg>';btn.style.color='';},1500)})})(this)"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right column: live demo card -->
+    <div class="hero-demo-card" role="region" aria-label="Live signals demo">
+      <div class="hero-demo-topbar" aria-hidden="true">
+        <span class="topbar-dot topbar-dot-r"></span>
+        <span class="topbar-dot topbar-dot-y"></span>
+        <span class="topbar-dot topbar-dot-g"></span>
+        <span class="topbar-label">HeroDemo.tsx — live actjs component</span>
+      </div>
+      <div class="hero-demo-mount">
+        <div id="hero-demo"></div>
       </div>
     </div>
   </div>
 
-  <!-- ─── Signals ──────────────────────────────────────────────────────────── -->
-  <section class="section" id="signals">
-    <div class="container">
-      <div class="section-label">Core reactivity</div>
-      <h2 class="section-title">Signals &amp; Computed</h2>
-      <p class="section-desc">
-        A signal is a value that components subscribe to automatically when they read it.
-        No watchers. No dependency lists. Just call the getter inside a render.
-      </p>
-
-      <div class="demo-grid">
-        <!-- Counter demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">signal() — counter</span>
-            <span class="demo-card-badge badge-signal">LIVE</span>
-          </div>
-          <div class="demo-preview" id="signal-counter-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> [count, setCount] = <span class="fn">signal</span>(<span class="num">0</span>);
-
-<span class="cm">// Getter call inside render = subscription</span>
-<span class="kw">return</span> () =&gt; (
-  &lt;<span class="fn">div</span>&gt;
-    &lt;<span class="fn">p</span>&gt;<span class="pn">{</span>count()<span class="pn">}</span>&lt;/<span class="fn">p</span>&gt;
-    &lt;<span class="fn">button</span> <span class="pn">type</span>=<span class="str">"button"</span> <span class="pn">onClick</span>={increment}&gt;+&lt;/<span class="fn">button</span>&gt;
-  &lt;/<span class="fn">div</span>&gt;
-);</code></pre>
-          </div>
-        </div>
-
-        <!-- Computed demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">computed() — derived state</span>
-            <span class="demo-card-badge badge-computed">LIVE</span>
-          </div>
-          <div class="demo-preview" id="computed-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> [n, setN] = <span class="fn">signal</span>(<span class="num">4</span>);
-
-<span class="cm">// Re-computes only when n() changes</span>
-<span class="kw">const</span> squared  = <span class="fn">computed</span>(() =&gt; n() ** <span class="num">2</span>);
-<span class="kw">const</span> isEven   = <span class="fn">computed</span>(() =&gt; n() % <span class="num">2</span> === <span class="num">0</span>);</code></pre>
-          </div>
-        </div>
-
-        <!-- Text binding demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">Reactive text binding</span>
-            <span class="demo-card-badge badge-signal">LIVE</span>
-          </div>
-          <div class="demo-preview" id="textbind-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> [name, setName] = <span class="fn">signal</span>(<span class="str">''</span>);
-
-<span class="cm">// Input updates signal → greeting re-renders</span>
-<span class="kw">return</span> () =&gt; (
-  &lt;<span class="fn">div</span>&gt;
-    &lt;<span class="fn">input</span> <span class="pn">onInput</span>={e =&gt; <span class="fn">setName</span>(e.target.value)} /&gt;
-    &lt;<span class="fn">p</span>&gt;Hello, <span class="pn">{</span>name()<span class="pn">}</span>!&lt;/<span class="fn">p</span>&gt;
-  &lt;/<span class="fn">div</span>&gt;
-);</code></pre>
-          </div>
-        </div>
-
-        <!-- globalSignal demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">globalSignal() — shared state</span>
-            <span class="demo-card-badge badge-signal">LIVE</span>
-          </div>
-          <div class="demo-preview" id="global-signal-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="cm">// Same key = same signal everywhere</span>
-<span class="kw">const</span> [theme, setTheme] =
-  <span class="fn">globalSignal</span>(<span class="str">'theme'</span>, <span class="str">'light'</span>);
-
-<span class="cm">// ComponentA and ComponentB share it</span>
-<span class="fn">setTheme</span>(<span class="str">'dark'</span>); <span class="cm">// both re-render</span></code></pre>
-          </div>
-        </div>
+  <!-- Stats strip -->
+  <div class="stats-strip" aria-label="Key metrics">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-val accent">8 kB</div>
+        <div class="stat-label">gzipped runtime</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val pink">0</div>
+        <div class="stat-label">runtime dependencies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val amber">3</div>
+        <div class="stat-label">hydration modes</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val emerald">100%</div>
+        <div class="stat-label">TypeScript coverage</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ─── Components ────────────────────────────────────────────────────────── -->
-  <section class="section" id="components">
-    <div class="container">
-      <div class="section-label">Component model</div>
-      <h2 class="section-title">Components &amp; Lifecycle</h2>
-      <p class="section-desc">
-        <code style="color:var(--accent)">component(setup)</code> runs setup once.
-        Setup returns a render function that re-runs when its signals change.
-        Handlers, derived state, and lifecycle hooks live in setup — created once, never re-created.
-      </p>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     01 — PHILOSOPHY
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="philosophy" class="section-wrap fade-up" aria-labelledby="philosophy-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">01</span>
+      <span class="section-tag">Philosophy</span>
+    </div>
+    <h2 class="section-title" id="philosophy-heading">Built on three principles.</h2>
+    <p class="section-sub">
+      Every design decision in actjs traces back to one of three principles. No magic,
+      no hidden runtime cost, no framework lock-in.
+    </p>
 
-      <div class="demo-grid">
-        <!-- Todo list demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">component() — todo list</span>
-            <span class="demo-card-badge badge-component">LIVE</span>
-          </div>
-          <div class="demo-preview" id="todo-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> Todo = <span class="fn">component</span>(() =&gt; {
-  <span class="kw">const</span> [items, setItems] = <span class="fn">signal</span>([]);
+    <div class="pillars-grid">
+      <!-- Pillar 1 -->
+      <article class="pillar">
+        <div class="pillar-icon pillar-icon-violet" aria-hidden="true">⚡</div>
+        <h3 class="pillar-title">Explicit Subscriptions</h3>
+        <p class="pillar-body">
+          Calling a signal getter inside a computed or render function creates a live
+          subscription. No decorators, no proxies, no compiler magic — just a function call.
+          You always know exactly what re-renders and why.
+        </p>
+        <div class="pillar-code" aria-label="Code example: explicit subscriptions"><span class="cm">// only re-renders when count() changes</span>
+<span class="kw">const</span> doubled = <span class="fn">computed</span>(() =&gt; count() * <span class="num">2</span>);</div>
+      </article>
 
-  <span class="cm">// handlers created once in setup</span>
-  <span class="kw">const</span> add = text =&gt;
-    <span class="fn">setItems</span>(it =&gt; [...it, { text, done: <span class="kw">false</span> }]);
+      <!-- Pillar 2 -->
+      <article class="pillar">
+        <div class="pillar-icon pillar-icon-pink" aria-hidden="true">🏝</div>
+        <h3 class="pillar-title">Island Architecture</h3>
+        <p class="pillar-body">
+          Static components render on the server and ship zero JavaScript. Interactive islands
+          hydrate on demand. The page loads as fast as plain HTML — JS only enters where you
+          explicitly call for it.
+        </p>
+        <div class="pillar-code" aria-label="Code example: island hydration"><span class="cm">// zero JS shipped for static components</span>
+<span class="fn">component</span>(setup, <span class="pn">{</span> hydrate: <span class="str">'static'</span> <span class="pn">}</span>);
+<span class="fn">component</span>(setup, <span class="pn">{</span> hydrate: <span class="str">'interactive'</span> <span class="pn">}</span>);</div>
+      </article>
 
-  <span class="kw">return</span> () =&gt; <span class="cm">/* render with items() */</span>;
-});</code></pre>
-          </div>
+      <!-- Pillar 3 -->
+      <article class="pillar">
+        <div class="pillar-icon pillar-icon-amber" aria-hidden="true">📦</div>
+        <h3 class="pillar-title">No Build Required</h3>
+        <p class="pillar-body">
+          Drop a single script tag and start building. When you're ready for TypeScript,
+          JSX, and a build step, actjs meets you there too — same API, same mental model,
+          zero friction either way.
+        </p>
+        <div class="pillar-code" aria-label="Code example: script tag usage"><span class="cm">// CDN, no build step</span>
+&lt;<span class="kw">script</span> <span class="fn">src</span>=<span class="str">"https://cdn.actjs.dev/actjs.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     02 — SIGNALS & REACTIVITY
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="signals" class="section-wrap fade-up" aria-labelledby="signals-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">02</span>
+      <span class="section-tag">Signals &amp; Reactivity</span>
+    </div>
+    <h2 class="section-title" id="signals-heading">Fine-grained. Explicit. Fast.</h2>
+    <p class="section-sub">
+      Signals are the reactive primitive. Computed values derive automatically.
+      Text bindings update individual DOM nodes without diffing the whole tree.
+    </p>
+
+    <div class="demo-grid">
+      <!-- Signal Counter -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">signal() — basic state</span>
+          <span class="demo-card-tag">core</span>
         </div>
-
-        <!-- Lifecycle demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">onInit / onMount / onDestroy</span>
-            <span class="demo-card-badge badge-lifecycle">LIVE</span>
-          </div>
-          <div class="demo-preview" id="lifecycle-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> C = <span class="fn">component</span>(() =&gt; {
-  <span class="cm">// server + client</span>
-  <span class="fn">onInit</span>(() =&gt; log(<span class="str">'init'</span>));
-  <span class="cm">// client only — DOM ready</span>
-  <span class="fn">onMount</span>(() =&gt; log(<span class="str">'mount'</span>));
-  <span class="cm">// client only — cleanup</span>
-  <span class="fn">onDestroy</span>(() =&gt; log(<span class="str">'destroy'</span>));
-  <span class="kw">return</span> () =&gt; &lt;<span class="fn">div</span>&gt;Hello&lt;/<span class="fn">div</span>&gt;;
-});</code></pre>
-          </div>
+        <div class="demo-card-body">
+          <div id="signal-counter-preview"></div>
         </div>
+      </article>
 
-        <!-- Ref demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">ref() — DOM access</span>
-            <span class="demo-card-badge badge-component">LIVE</span>
-          </div>
-          <div class="demo-preview" id="ref-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> C = <span class="fn">component</span>(() =&gt; {
-  <span class="kw">const</span> inputRef = <span class="fn">ref</span>();
-
-  <span class="fn">onMount</span>(() =&gt; {
-    <span class="cm">// DOM is ready — .current is populated</span>
-    inputRef.current.focus();
-  });
-
-  <span class="kw">return</span> () =&gt; (
-    &lt;<span class="fn">input</span> <span class="pn">ref</span>={inputRef} <span class="pn">placeholder</span>=<span class="str">"..."</span> /&gt;
-  );
-});</code></pre>
-          </div>
+      <!-- Computed Demo -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">computed() — derived state</span>
+          <span class="demo-card-tag">core</span>
         </div>
-
-        <!-- el.* hyperscript demo -->
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">el.* — no-build hyperscript</span>
-            <span class="demo-card-badge badge-component">LIVE</span>
-          </div>
-          <div class="demo-preview" id="el-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="cm">// el.* is a Proxy over h()</span>
-<span class="cm">// props auto-detected — no null needed</span>
-el.div(
-  el.h2(<span class="str">'Hello'</span>),
-  el.p({ class: <span class="str">'note'</span> }, <span class="str">'Works in script tags'</span>),
-  el.button({ onclick: fn }, <span class="str">'Click me'</span>),
-)</code></pre>
-          </div>
+        <div class="demo-card-body">
+          <div id="computed-preview"></div>
         </div>
+      </article>
+
+      <!-- TextBind -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">textBind() — DOM text node</span>
+          <span class="demo-card-tag pink">dom</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="textbind-preview"></div>
+        </div>
+      </article>
+
+      <!-- Global Signal -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">globalSignal() — shared state</span>
+          <span class="demo-card-tag amber">global</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="global-signal-preview"></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     03 — COMPONENT MODEL
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="components" class="section-wrap fade-up" aria-labelledby="components-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">03</span>
+      <span class="section-tag">Component Model</span>
+    </div>
+    <h2 class="section-title" id="components-heading">Components that compose cleanly.</h2>
+    <p class="section-sub">
+      Lifecycle hooks, DOM refs, and dynamic element creation — all with the same
+      explicit, zero-magic API. Setup runs once; the render function re-runs reactively.
+    </p>
+
+    <div class="demo-grid">
+      <!-- Todo -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">TodoDemo — list state</span>
+          <span class="demo-card-tag">signals + computed</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="todo-preview"></div>
+        </div>
+      </article>
+
+      <!-- Lifecycle -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">onInit / onMount / onDestroy</span>
+          <span class="demo-card-tag amber">lifecycle</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="lifecycle-preview"></div>
+        </div>
+      </article>
+
+      <!-- Ref -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">ref() — DOM element access</span>
+          <span class="demo-card-tag pink">dom</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="ref-preview"></div>
+        </div>
+      </article>
+
+      <!-- El -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">el.*() — programmatic DOM</span>
+          <span class="demo-card-tag pink">dom</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="el-preview"></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     04 — ROUTER
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="router" class="section-wrap fade-up" aria-labelledby="router-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">04</span>
+      <span class="section-tag">Router</span>
+    </div>
+    <h2 class="section-title" id="router-heading">Client-side routing, zero config.</h2>
+    <p class="section-sub">
+      Pattern matching with named params, nested routes, and 404 handling.
+      The router is just a signal — navigate by writing to it.
+    </p>
+
+    <div class="demo-card demo-card-narrow">
+      <div class="demo-card-header">
+        <span class="demo-card-title">RouterDemo — pattern matching</span>
+        <span class="demo-card-tag green">routing</span>
+      </div>
+      <div id="router-preview" class="router-preview-mount"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     05 — ASYNC DATA
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="async" class="section-wrap fade-up" aria-labelledby="async-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">05</span>
+      <span class="section-tag">Async Data</span>
+    </div>
+    <h2 class="section-title" id="async-heading">Suspense and streaming, built in.</h2>
+    <p class="section-sub">
+      Resource primitives handle loading, error, and data states as first-class signals.
+      Pair with Suspense for streaming SSR — the shell renders immediately while data resolves.
+    </p>
+
+    <div class="demo-card demo-card-narrow">
+      <div class="demo-card-header">
+        <span class="demo-card-title">ResourceDemo — async fetch simulation</span>
+        <span class="demo-card-tag pink">async</span>
+      </div>
+      <div class="demo-card-body">
+        <div id="resource-preview"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ─── Router ────────────────────────────────────────────────────────────── -->
-  <section class="section" id="router">
-    <div class="container">
-      <div class="section-label">Client-side routing</div>
-      <h2 class="section-title">Built-in Router</h2>
-      <p class="section-desc">
-        <code style="color:var(--accent)">createRouter()</code> returns a component that re-renders reactively on
-        navigation.
-        Route params are signals. Zero dependencies.
-      </p>
-
-      <div class="demo-grid cols-1">
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">createRouter() + navigate() + Link + params()</span>
-            <span class="demo-card-badge badge-router">LIVE</span>
-          </div>
-          <div class="demo-preview" id="router-preview" style="padding:0"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> App = <span class="fn">createRouter</span>([
-  { path: <span class="str">'/'</span>,           component: Home },
-  { path: <span class="str">'/blog/:slug'</span>, component: BlogPost },
-  { path: <span class="str">'*'</span>,           component: NotFound },
-]);
-
-<span class="cm">// Programmatic navigation</span>
-<span class="fn">navigate</span>(<span class="str">'/blog/hello-world'</span>);
-
-<span class="cm">// Declarative — prevents full reload</span>
-<span class="fn">Link</span>({ href: <span class="str">'/about'</span>, children: <span class="str">'About'</span> });
-
-<span class="cm">// Reactive param access</span>
-<span class="kw">const</span> p = <span class="fn">params</span>(); <span class="cm">// { slug: 'hello-world' }</span>
-
-<span class="cm">// Query string</span>
-<span class="fn">navigate</span>(<span class="str">'/search?q=actjs'</span>);
-<span class="kw">const</span> q = <span class="fn">query</span>(); <span class="cm">// { q: 'actjs' }</span></code></pre>
-          </div>
-        </div>
-      </div>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     06 — GET STARTED
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="get-started" class="section-wrap fade-up" aria-labelledby="getstarted-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">06</span>
+      <span class="section-tag">Get Started</span>
     </div>
-  </section>
+    <h2 class="section-title" id="getstarted-heading">Three ways to start.</h2>
+    <p class="section-sub">
+      Scaffold a full project, drop a script tag, or install via npm with full TypeScript support.
+    </p>
 
-  <!-- ─── Resource + Suspense ──────────────────────────────────────────────── -->
-  <section class="section" id="resource">
-    <div class="container">
-      <div class="section-label">Async data</div>
-      <h2 class="section-title">resource() + Suspense</h2>
-      <p class="section-desc">
-        Async data loading with built-in loading and error states.
-        On the server, data is awaited before streaming. On the client, the component re-renders when data arrives.
-      </p>
-
-      <div class="demo-grid">
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">resource() — async fetch</span>
-            <span class="demo-card-badge badge-resource">LIVE</span>
-          </div>
-          <div class="demo-preview" id="resource-preview"></div>
-          <div class="demo-code">
-            <pre><code><span class="kw">const</span> posts = <span class="fn">resource</span>(() =&gt;
-  <span class="fn">fetch</span>(<span class="str">'/api/posts'</span>).<span class="fn">then</span>(r =&gt; r.<span class="fn">json</span>())
-);
-
-<span class="kw">return</span> () =&gt; posts.<span class="fn">loading</span>()
-  ? &lt;<span class="fn">div</span>&gt;Loading...&lt;/<span class="fn">div</span>&gt;
-  : posts.<span class="fn">error</span>()
-  ? &lt;<span class="fn">p</span>&gt;Error!&lt;/<span class="fn">p</span>&gt;
-  : &lt;<span class="fn">ul</span>&gt;<span class="pn">{</span>posts().<span class="fn">map</span>(renderPost)<span class="pn">}</span>&lt;/<span class="fn">ul</span>&gt;;</code></pre>
-          </div>
+    <div class="gs-cols">
+      <!-- Option 1: Scaffold -->
+      <div class="gs-col">
+        <div class="gs-col-header">
+          <div class="gs-col-title">Scaffold a project</div>
+          <div class="gs-col-sub">npx · recommended</div>
         </div>
-
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">Suspense — streaming boundary</span>
-            <span class="demo-card-badge badge-resource">SSR</span>
-          </div>
-          <div class="demo-preview" id="suspense-preview">
-            <div class="d-muted" style="font-size:0.85rem;margin-bottom:0.75rem">
-              On the server, Suspense streams fallback HTML immediately, then swaps to the real content as async data
-              resolves.
+        <div class="gs-col-body">
+          <div class="gs-steps">
+            <div class="gs-step">
+              <div class="gs-step-num">1</div>
+              <div class="gs-step-content">
+                <div class="gs-step-label">Create</div>
+                <div class="gs-code-block">npx actjs create my-app</div>
+              </div>
             </div>
-            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
-              <div
-                style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:0.75rem;color:var(--muted)">
-                SSR stream</div>
-              <div style="padding:1rem">
-                <div style="color:var(--green);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:0.4rem">
-                  &rarr; streams immediately:</div>
-                <div
-                  style="background:var(--bg);border-radius:4px;padding:0.5rem 0.75rem;font-family:var(--font-mono);font-size:0.78rem;margin-bottom:0.75rem;color:var(--muted)">
-                  &lt;div class="skeleton"&gt;Loading...&lt;/div&gt;</div>
-                <div style="color:var(--accent);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:0.4rem">
-                  &rarr; swaps when resolved:</div>
-                <div
-                  style="background:var(--bg);border-radius:4px;padding:0.5rem 0.75rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--muted)">
-                  &lt;PostList posts={[...]} /&gt;</div>
+            <div class="gs-step">
+              <div class="gs-step-num">2</div>
+              <div class="gs-step-content">
+                <div class="gs-step-label">Install</div>
+                <div class="gs-code-block">cd my-app &amp;&amp; npm install</div>
+              </div>
+            </div>
+            <div class="gs-step">
+              <div class="gs-step-num">3</div>
+              <div class="gs-step-content">
+                <div class="gs-step-label"><strong>Build</strong> — opens dist/index.html directly, no server needed</div>
+                <div class="gs-code-block">npm run build</div>
+              </div>
+            </div>
+            <div class="gs-step">
+              <div class="gs-step-num">4</div>
+              <div class="gs-step-content">
+                <div class="gs-step-label">Or develop with hot reload</div>
+                <div class="gs-code-block"><span class="cm"># optional</span>
+npm run dev</div>
               </div>
             </div>
           </div>
-          <div class="demo-code">
-            <pre><code><span class="cm">// SSR: streams fallback immediately,</span>
-<span class="cm">// swaps content when data resolves</span>
-&lt;<span class="fn">Suspense</span> <span class="pn">fallback</span>={&lt;<span class="fn">div</span>&gt;Loading...&lt;/<span class="fn">div</span>&gt;}&gt;
-  &lt;<span class="fn">PostList</span> <span class="pn">posts</span>={posts} /&gt;
-&lt;/<span class="fn">Suspense</span>&gt;</code></pre>
-          </div>
+        </div>
+      </div>
+
+      <!-- Option 2: CDN -->
+      <div class="gs-col">
+        <div class="gs-col-header">
+          <div class="gs-col-title">Script tag / CDN</div>
+          <div class="gs-col-sub">zero build · instant start</div>
+        </div>
+        <div class="gs-col-body">
+          <div class="gs-code-block"><span class="cm">&lt;!-- Drop in your HTML --&gt;</span>
+&lt;<span class="kw">script</span> <span class="fn">src</span>=<span class="str">"https://cdn.actjs.dev/actjs.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;
+&lt;<span class="kw">div</span> <span class="fn">id</span>=<span class="str">"app"</span>&gt;&lt;/<span class="kw">div</span>&gt;
+&lt;<span class="kw">script</span>&gt;
+  <span class="kw">const</span> { createApp, component, signal } = actjs;
+
+  <span class="kw">const</span> Counter = <span class="fn">component</span>(() =&gt; <span class="pn">{</span>
+    <span class="kw">const</span> [count, setCount] = <span class="fn">signal</span>(<span class="num">0</span>);
+    <span class="kw">return</span> () =&gt; <span class="str">`&lt;button onclick="..."&gt;${count()}&lt;/button&gt;`</span>;
+  <span class="pn">}</span>);
+
+  <span class="fn">createApp</span>(<span class="str">'#app'</span>).<span class="fn">mount</span>(Counter);
+&lt;/<span class="kw">script</span>&gt;</div>
+        </div>
+      </div>
+
+      <!-- Option 3: npm + TypeScript -->
+      <div class="gs-col">
+        <div class="gs-col-header">
+          <div class="gs-col-title">npm + TypeScript</div>
+          <div class="gs-col-sub">full type safety · JSX support</div>
+        </div>
+        <div class="gs-col-body">
+          <div class="gs-code-block"><span class="cm"># install</span>
+npm install actjs
+
+<span class="cm"># component with full types</span>
+<span class="kw">import</span> <span class="pn">{</span>
+  component, signal, computed,
+  onMount, ref
+<span class="pn">}</span> <span class="kw">from</span> <span class="str">'actjs'</span>;
+
+<span class="kw">export const</span> MyComp = <span class="fn">component</span>(() =&gt; <span class="pn">{</span>
+  <span class="kw">const</span> [val, setVal] = <span class="fn">signal</span>&lt;<span class="tp">number</span>&gt;(<span class="num">0</span>);
+  <span class="kw">const</span> doubled = <span class="fn">computed</span>(() =&gt; val() * <span class="num">2</span>);
+
+  <span class="fn">onMount</span>(() =&gt; <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'mounted'</span>));
+
+  <span class="kw">return</span> () =&gt; (
+    &lt;<span class="kw">div</span>&gt;<span class="pn">{</span>doubled()<span class="pn">}</span>&lt;/<span class="kw">div</span>&gt;
+  );
+<span class="pn">}</span>, <span class="pn">{</span> hydrate: <span class="str">'interactive'</span> <span class="pn">}</span>);</div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ─── Island hydration ──────────────────────────────────────────────────── -->
-  <section class="section" id="ssr">
-    <div class="container">
-      <div class="section-label">Island architecture</div>
-      <h2 class="section-title">SSR + Island Hydration</h2>
-      <p class="section-desc">
-        Each component declares its own hydration strategy. Static components ship zero JS.
-        Interactive islands hydrate on load. Visible islands hydrate when scrolled into view.
-      </p>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     07 — ISLAND ARCHITECTURE
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="islands" class="section-wrap fade-up" aria-labelledby="islands-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">07</span>
+      <span class="section-tag">Island Architecture</span>
+    </div>
+    <h2 class="section-title" id="islands-heading">Pay only for what you ship.</h2>
+    <p class="section-sub">
+      Three hydration modes let you choose the cost of each component precisely.
+      Static islands never touch the JS bundle. Interactive islands hydrate eagerly.
+      Visible islands defer until they enter the viewport.
+    </p>
 
-      <div class="island-grid">
-        <div class="island-card">
-          <div class="island-icon" style="background:rgba(107,107,128,0.15)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b6b80" stroke-width="2">
-              <path d="M4 6h16M4 12h16M4 18h7" />
-            </svg>
-          </div>
-          <h3>Static</h3>
-          <p>Renders to pure HTML on the server. Zero JavaScript shipped. Perfect for headers, footers, marketing copy.
-          </p>
-          <code>hydrate: 'static'</code>
-        </div>
-        <div class="island-card">
-          <div class="island-icon" style="background:rgba(201,255,51,0.1)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9ff33" stroke-width="2">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
-          </div>
-          <h3>Interactive</h3>
-          <p>Hydrates immediately on page load. Best for above-the-fold widgets that need to be interactive right away.
-          </p>
-          <code>hydrate: 'interactive'</code>
-        </div>
-        <div class="island-card">
-          <div class="island-icon" style="background:rgba(51,170,255,0.1)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#33aaff" stroke-width="2">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4l3 3" />
-            </svg>
-          </div>
-          <h3>Visible</h3>
-          <p>Hydrates only when scrolled into view using IntersectionObserver. Best for LCP — skips JS for off-screen
-            content.</p>
-          <code>hydrate: 'visible'</code>
-        </div>
-      </div>
-
-      <div class="callout" style="margin-top:2rem">
+    <div class="island-grid">
+      <!-- Static -->
+      <article class="island-card static">
+        <div class="island-mode static">static</div>
+        <h3>Zero JS</h3>
         <p>
-          Use <code>renderToString(component)</code> from <code>actjs/server</code> for SSR.
-          On the client, pass <code>{ hydrate: true }</code> to <code>createApp()</code> to adopt
-          the server-rendered DOM without clearing it — bots see full HTML, users get a reactive island.
+          Rendered on the server. No JavaScript shipped to the client.
+          Ideal for navigation, footers, and any content that doesn't change.
         </p>
-      </div>
+        <div class="island-snippet"><span class="fn">component</span>(setup, <span class="pn">{</span>
+  hydrate: <span class="str">'static'</span>
+<span class="pn">}</span>);<span class="cm">
+// → 0 bytes JS</span></div>
+      </article>
 
-      <div class="demo-grid" style="margin-top:2rem">
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">SSR usage</span>
-            <span class="demo-card-badge badge-component">SERVER</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="cm">// actjs/server subpath</span>
-<span class="kw">import</span> { renderToString } <span class="kw">from</span> <span class="str">'actjs/server'</span>;
+      <!-- Interactive -->
+      <article class="island-card interactive">
+        <div class="island-mode interactive">interactive</div>
+        <h3>Eager Hydration</h3>
+        <p>
+          Hydrates immediately after page load. Full signal reactivity available.
+          Use for above-the-fold interactive elements where time-to-interactive matters.
+        </p>
+        <div class="island-snippet"><span class="fn">component</span>(setup, <span class="pn">{</span>
+  hydrate: <span class="str">'interactive'</span>
+<span class="pn">}</span>);<span class="cm">
+// → hydrates on load</span></div>
+      </article>
 
-<span class="kw">const</span> html = <span class="kw">await</span> <span class="fn">renderToString</span>(MyPage);
-res.<span class="fn">send</span>(<span class="str">`&lt;!DOCTYPE html&gt;
-&lt;html&gt;&lt;body&gt;</span>${html}<span class="str">&lt;/body&gt;&lt;/html&gt;`</span>);</code></pre>
-          </div>
-        </div>
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">Client hydration</span>
-            <span class="demo-card-badge badge-component">CLIENT</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="cm">// Adopt SSR DOM — don't clear it</span>
-<span class="fn">createApp</span>(<span class="str">'#root'</span>, { hydrate: <span class="kw">true</span> })
-  .<span class="fn">mount</span>(MyPage);
-
-<span class="cm">// static island — zero JS shipped</span>
-<span class="kw">const</span> Header = <span class="fn">component</span>(() =&gt; () =&gt; ...,
-  { hydrate: <span class="str">'static'</span> }
-);</code></pre>
-          </div>
-        </div>
-      </div>
+      <!-- Visible -->
+      <article class="island-card visible">
+        <div class="island-mode visible">visible</div>
+        <h3>Deferred Hydration</h3>
+        <p>
+          Uses IntersectionObserver to hydrate only when the component enters
+          the viewport. Best for below-the-fold content — keeps TTI minimal.
+        </p>
+        <div class="island-snippet"><span class="fn">component</span>(setup, <span class="pn">{</span>
+  hydrate: <span class="str">'visible'</span>
+<span class="pn">}</span>);<span class="cm">
+// → hydrates on scroll</span></div>
+      </article>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ─── JSX + html template ──────────────────────────────────────────────── -->
-  <section class="section" id="jsx">
-    <div class="container">
-      <div class="section-label">Template options</div>
-      <h2 class="section-title">JSX, el.*, and html``</h2>
-      <p class="section-desc">
-        Three ways to write templates — pick what fits your stack.
-        All produce real DOM nodes directly. No virtual DOM involved.
+<!-- ═══════════════════════════════════════════════════════════════════════
+     08 — FRAMEWORK COMPATIBILITY
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="compat" class="section-wrap fade-up" aria-labelledby="compat-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">08</span>
+      <span class="section-tag">Framework Compatibility</span>
+    </div>
+    <h2 class="section-title" id="compat-heading">Works with any backend.</h2>
+    <p class="section-sub">
+      actjs is framework-agnostic. Render the shell server-side in Django, Express, Rails,
+      or anything that outputs HTML — then mount islands on the client.
+    </p>
+
+    <div class="compat-grid">
+      <!-- Django -->
+      <article class="compat-card">
+        <div class="compat-card-header">
+          <span class="compat-icon">🐍</span>
+          <span class="compat-card-title">Django / Jinja2</span>
+        </div>
+        <div class="compat-card-body">
+          <div class="code-block"><span class="cm">{# templates/index.html #}</span>
+<span class="cm">&lt;!-- Static shell rendered by Django --&gt;</span>
+&lt;<span class="kw">div</span> <span class="fn">class</span>=<span class="str">"hero"</span>&gt;
+  &lt;<span class="kw">h1</span>&gt;<span class="pn">{{</span> page.title <span class="pn">}}</span>&lt;/<span class="kw">h1</span>&gt;
+&lt;/<span class="kw">div</span>&gt;
+
+<span class="cm">&lt;!-- Interactive island --&gt;</span>
+&lt;<span class="kw">div</span> <span class="fn">id</span>=<span class="str">"cart-widget"</span>&gt;&lt;/<span class="kw">div</span>&gt;
+
+&lt;<span class="kw">script</span> <span class="fn">type</span>=<span class="str">"module"</span> <span class="fn">src</span>=<span class="str">"/static/app.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;
+
+<span class="cm">// app.js</span>
+<span class="kw">import</span> <span class="pn">{</span> createApp <span class="pn">}</span> <span class="kw">from</span> <span class="str">'actjs'</span>;
+<span class="kw">import</span> <span class="pn">{</span> CartWidget <span class="pn">}</span> <span class="kw">from</span> <span class="str">'./CartWidget'</span>;
+
+<span class="fn">createApp</span>(<span class="str">'#cart-widget'</span>).<span class="fn">mount</span>(CartWidget);</div>
+        </div>
+      </article>
+
+      <!-- Node.js / Express -->
+      <article class="compat-card">
+        <div class="compat-card-header">
+          <span class="compat-icon">🟩</span>
+          <span class="compat-card-title">Node.js / Express</span>
+        </div>
+        <div class="compat-card-body">
+          <div class="code-block"><span class="cm">// server.js — SSR shell</span>
+<span class="kw">import</span> <span class="pn">{</span> renderToString <span class="pn">}</span> <span class="kw">from</span> <span class="str">'actjs/server'</span>;
+<span class="kw">import</span> <span class="pn">{</span> App <span class="pn">}</span> <span class="kw">from</span> <span class="str">'./App'</span>;
+
+app.<span class="fn">get</span>(<span class="str">'/'</span>, <span class="kw">async</span> (req, res) =&gt; <span class="pn">{</span>
+  <span class="kw">const</span> html = <span class="kw">await</span> <span class="fn">renderToString</span>(App, <span class="pn">{</span>
+    props: <span class="pn">{</span> user: req.user <span class="pn">}</span>
+  <span class="pn">}</span>);
+  res.<span class="fn">send</span>(<span class="str">`&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;body&gt;
+  &lt;div id="root"&gt;${html}&lt;/div&gt;
+  &lt;script type="module" src="/app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;`</span>);
+<span class="pn">}</span>);</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     09 — API REFERENCE
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="api" class="section-wrap fade-up" aria-labelledby="api-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">09</span>
+      <span class="section-tag">API Reference</span>
+    </div>
+    <h2 class="section-title" id="api-heading">The complete surface area.</h2>
+    <p class="section-sub">
+      Small, intentional, and stable. Everything actjs exports — no surprises.
+    </p>
+
+    <div class="api-table-wrap" role="region" aria-label="API reference table">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Signature</th>
+            <th scope="col">Description</th>
+            <th scope="col">Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="api-name">signal</span></td>
+            <td><span class="api-sig">signal&lt;T&gt;(init: T) → [() → T, (v: T | (prev: T) → T) → void]</span></td>
+            <td class="api-desc">Creates a reactive value. Getter subscribes; setter triggers updates.</td>
+            <td><span class="api-badge core">core</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">computed</span></td>
+            <td><span class="api-sig">computed&lt;T&gt;(fn: () → T) → () → T</span></td>
+            <td class="api-desc">Derives a memoised value from other signals. Re-evaluates only when dependencies change.</td>
+            <td><span class="api-badge core">core</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">globalSignal</span></td>
+            <td><span class="api-sig">globalSignal&lt;T&gt;(key: string, init: T) → [() → T, setter]</span></td>
+            <td class="api-desc">Application-scoped signal shared across component instances.</td>
+            <td><span class="api-badge core">core</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">component</span></td>
+            <td><span class="api-sig">component(setup: () → renderFn, opts?: Options) → Component</span></td>
+            <td class="api-desc">Defines a component. Setup runs once; returned render function runs reactively.</td>
+            <td><span class="api-badge core">core</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">createApp</span></td>
+            <td><span class="api-sig">createApp(selector: string) → { mount(c: Component): void }</span></td>
+            <td class="api-desc">Mounts a component into a DOM target. Entry point for island hydration.</td>
+            <td><span class="api-badge core">core</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">onInit</span></td>
+            <td><span class="api-sig">onInit(fn: () → void) → void</span></td>
+            <td class="api-desc">Runs during component setup — executes on both server and client.</td>
+            <td><span class="api-badge lifecycle">lifecycle</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">onMount</span></td>
+            <td><span class="api-sig">onMount(fn: () → void | (() → void)) → void</span></td>
+            <td class="api-desc">Runs after the component is inserted into the DOM. Return a cleanup function.</td>
+            <td><span class="api-badge lifecycle">lifecycle</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">onDestroy</span></td>
+            <td><span class="api-sig">onDestroy(fn: () → void) → void</span></td>
+            <td class="api-desc">Runs when the component is removed from the DOM.</td>
+            <td><span class="api-badge lifecycle">lifecycle</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">ref</span></td>
+            <td><span class="api-sig">ref&lt;T extends Element&gt;() → { current: T | undefined }</span></td>
+            <td class="api-desc">Creates a mutable reference to a DOM element. Populated after mount.</td>
+            <td><span class="api-badge dom">dom</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">el.*</span></td>
+            <td><span class="api-sig">el.div(attrs?, ...children) → HTMLElement</span></td>
+            <td class="api-desc">Programmatic element builders — all HTML tags available as methods.</td>
+            <td><span class="api-badge dom">dom</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">textBind</span></td>
+            <td><span class="api-sig">textBind(fn: () → string) → Text</span></td>
+            <td class="api-desc">Creates a live text node that updates without re-rendering parent elements.</td>
+            <td><span class="api-badge dom">dom</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">createRouter</span></td>
+            <td><span class="api-sig">createRouter(routes: Route[]) → Router</span></td>
+            <td class="api-desc">Hash or history-based router. Exposes current path and params as signals.</td>
+            <td><span class="api-badge routing">routing</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">resource</span></td>
+            <td><span class="api-sig">resource&lt;T&gt;(fetcher: () → Promise&lt;T&gt;) → ResourceState&lt;T&gt;</span></td>
+            <td class="api-desc">Wraps an async data source. Exposes loading, error, and data signals.</td>
+            <td><span class="api-badge async">async</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">renderToString</span></td>
+            <td><span class="api-sig">renderToString(c: Component, opts?) → Promise&lt;string&gt;</span></td>
+            <td class="api-desc">Server-side rendering entry point. Returns the HTML shell as a string.</td>
+            <td><span class="api-badge async">async</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     10 — COMPARISON
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="comparison" class="section-wrap fade-up" aria-labelledby="comparison-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">10</span>
+      <span class="section-tag">Comparison</span>
+    </div>
+    <h2 class="section-title" id="comparison-heading">How actjs stacks up.</h2>
+    <p class="section-sub">
+      actjs occupies a deliberate niche: SSR-first, zero-dep, fine-grained reactivity
+      with an API surface you can hold in your head.
+    </p>
+
+    <div class="cmp-table-wrap" role="region" aria-label="Framework comparison table">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            <th scope="col" class="highlight">actjs</th>
+            <th scope="col">React 18</th>
+            <th scope="col">Vue 3</th>
+            <th scope="col">Svelte 5</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Runtime size (gzip)</td>
+            <td class="highlight cmp-highlight-val">8 kB</td>
+            <td>~45 kB</td>
+            <td>~22 kB</td>
+            <td>~2 kB*</td>
+          </tr>
+          <tr>
+            <td>Runtime dependencies</td>
+            <td class="highlight"><span class="check">✓</span> 0</td>
+            <td>2 (react-dom)</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td>Fine-grained signals</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">−</span> hooks/vdom</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Explicit subscriptions</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">−</span></td>
+            <td><span class="partial">partial</span></td>
+            <td><span class="cross">−</span> compiler magic</td>
+          </tr>
+          <tr>
+            <td>Island architecture</td>
+            <td class="highlight"><span class="check">✓</span> built-in</td>
+            <td><span class="partial">via Next.js</span></td>
+            <td><span class="partial">via Nuxt</span></td>
+            <td><span class="partial">via SvelteKit</span></td>
+          </tr>
+          <tr>
+            <td>SSR / streaming</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>No build required</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="cross">−</span></td>
+            <td><span class="partial">partial</span></td>
+            <td><span class="cross">−</span></td>
+          </tr>
+          <tr>
+            <td>TypeScript first-class</td>
+            <td class="highlight"><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Compiler / transpiler required</td>
+            <td class="highlight"><span class="cross">−</span> optional</td>
+            <td><span class="cross-required">✓</span> required</td>
+            <td><span class="cross-required">✓</span> required</td>
+            <td><span class="cross-required">✓</span> required</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cmp-footnote">* Svelte compiles away most of its runtime; bundle size varies by app.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">act<span>js</span></div>
+      <p class="footer-tagline">
+        Reactive UI without the runtime. 8 kB gzipped, zero dependencies,
+        SSR-first with island architecture.
       </p>
+    </div>
 
-      <div class="demo-grid cols-3">
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">JSX (TypeScript)</span>
-            <span class="demo-card-badge badge-component">BUILD</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="cm">// tsconfig.json</span>
-<span class="str">"jsx"</span>: <span class="str">"react-jsx"</span>,
-<span class="str">"jsxImportSource"</span>: <span class="str">"actjs"</span>
-
-<span class="cm">// component</span>
-<span class="kw">return</span> () =&gt; (
-  &lt;div class=<span class="str">"card"</span>&gt;
-    &lt;h2&gt;{title()}&lt;/h2&gt;
-    &lt;p&gt;{body}&lt;/p&gt;
-  &lt;/div&gt;
-);</code></pre>
-          </div>
-        </div>
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">el.* (no build)</span>
-            <span class="demo-card-badge badge-signal">IIFE</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="cm">// Proxy over h() — works in</span>
-<span class="cm">// plain &lt;script&gt; tags</span>
-<span class="kw">return</span> () =&gt;
-  el.div({ class: <span class="str">'card'</span> },
-    el.h2(title()),
-    el.p(body),
-  );</code></pre>
-          </div>
-        </div>
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">html`` (tagged template)</span>
-            <span class="demo-card-badge badge-computed">ESM</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="cm">// Tagged template → Element (no build)</span>
-<span class="cm">// Functions wire as event listeners</span>
-<span class="kw">return</span> () =&gt; html<span class="str">`
-  &lt;div class="card"&gt;
-    &lt;h2&gt;</span>${title()}<span class="str">&lt;/h2&gt;
-    &lt;button onclick=</span>${fn}<span class="str">&gt;
-      Click
-    &lt;/button&gt;
-  &lt;/div&gt;
-`</span>;</code></pre>
-          </div>
-        </div>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <div class="footer-col">
+        <h4>Docs</h4>
+        <ul role="list">
+          <li><a href="#get-started">Get Started</a></li>
+          <li><a href="#api">API Reference</a></li>
+          <li><a href="#signals">Signals</a></li>
+          <li><a href="#islands">Islands</a></li>
+        </ul>
       </div>
-    </div>
-  </section>
 
-  <!-- ─── useHead ────────────────────────────────────────────────────────────── -->
-  <section class="section" id="head">
-    <div class="container">
-      <div class="section-label">SEO</div>
-      <h2 class="section-title">useHead — SSR-aware Head Management</h2>
-      <p class="section-desc">
-        Set document title and meta tags from inside any component.
-        On the server they're injected into the HTML stream. On the client they update <code>&lt;head&gt;</code> in
-        place.
-      </p>
-
-      <div class="demo-grid cols-1">
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">useHead()</span>
-            <span class="demo-card-badge badge-lifecycle">SSR + CLIENT</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="kw">const</span> BlogPost = <span class="fn">component</span>(() =&gt; {
-  <span class="kw">const</span> [title, setTitle] = <span class="fn">signal</span>(<span class="str">'My Post'</span>);
-
-  <span class="cm">// Reactive — updates &lt;title&gt; when title() changes</span>
-  <span class="fn">useHead</span>({
-    title: <span class="str">`</span>${title()}<span class="str"> | My Blog`</span>,
-    meta: [
-      { name: <span class="str">'description'</span>, content: <span class="str">'Post summary...'</span> },
-      { property: <span class="str">'og:title'</span>, content: title() },
-    ],
-    link: [
-      { rel: <span class="str">'canonical'</span>, href: <span class="str">'https://example.com/blog/my-post'</span> },
-    ],
-  });
-
-  <span class="kw">return</span> () =&gt; &lt;<span class="fn">article</span>&gt;<span class="pn">{</span>title()<span class="pn">}</span>&lt;/<span class="fn">article</span>&gt;;
-});</code></pre>
-          </div>
-        </div>
+      <div class="footer-col">
+        <h4>Demos</h4>
+        <ul role="list">
+          <li><a href="#signals">Reactivity</a></li>
+          <li><a href="#components">Components</a></li>
+          <li><a href="#router">Router</a></li>
+          <li><a href="#async">Async Data</a></li>
+        </ul>
       </div>
-    </div>
-  </section>
 
-  <!-- ─── App API ────────────────────────────────────────────────────────────── -->
-  <section class="section" id="app-api">
-    <div class="container">
-      <div class="section-label">App lifecycle</div>
-      <h2 class="section-title">createApp() — App Orchestrator</h2>
-      <p class="section-desc">
-        Mount components, inject CSS, run safe timers that auto-clear on destroy.
-        Multiple independent apps on one page — each is isolated.
-      </p>
-
-      <div class="demo-grid">
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">createApp()</span>
-            <span class="demo-card-badge badge-component">API</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="kw">const</span> app = <span class="fn">createApp</span>(<span class="str">'#root'</span>);
-
-<span class="cm">// Mount component</span>
-app.<span class="fn">mount</span>(Counter);
-
-<span class="cm">// Inject critical CSS (removed on destroy)</span>
-app.<span class="fn">criticalCSS</span>(<span class="str">'.btn { color: red }'</span>);
-app.<span class="fn">criticalStylesheet</span>(<span class="str">'/app.css'</span>);
-
-<span class="cm">// Safe timers — auto-cleared on destroy</span>
-app.<span class="fn">safeSetInterval</span>(tick, <span class="num">1000</span>);
-
-<span class="cm">// Cleanup everything</span>
-app.<span class="fn">destroy</span>();</code></pre>
-          </div>
-        </div>
-        <div class="demo-card">
-          <div class="demo-card-header">
-            <span class="demo-card-title">Multiple islands per page</span>
-            <span class="demo-card-badge badge-component">PATTERN</span>
-          </div>
-          <div class="demo-code" style="border-top:none">
-            <pre><code><span class="cm">// Each island is independent</span>
-<span class="fn">createApp</span>(<span class="str">'#cart'</span>).<span class="fn">mount</span>(Cart);
-<span class="fn">createApp</span>(<span class="str">'#search'</span>).<span class="fn">mount</span>(SearchBar);
-<span class="fn">createApp</span>(<span class="str">'#newsletter'</span>).<span class="fn">mount</span>(Newsletter);
-
-<span class="cm">// SSR hydration — adopt server DOM</span>
-<span class="fn">createApp</span>(<span class="str">'#root'</span>, { hydrate: <span class="kw">true</span> })
-  .<span class="fn">mount</span>(App);</code></pre>
-          </div>
-        </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <ul role="list">
+          <li><a href="https://github.com/me-vaisakhr/actjs" rel="noopener noreferrer" target="_blank">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/actjs" rel="noopener noreferrer" target="_blank">npm</a></li>
+          <li><a href="#comparison">Comparison</a></li>
+          <li><a href="#philosophy">Philosophy</a></li>
+        </ul>
       </div>
-    </div>
-  </section>
+    </nav>
+  </div>
 
-  <!-- ─── API Reference ─────────────────────────────────────────────────────── -->
-  <section class="section" id="api">
-    <div class="container">
-      <div class="section-label">Reference</div>
-      <h2 class="section-title">Full API</h2>
-      <p class="section-desc" style="margin-bottom:2rem">Every export from the <code>actjs</code> package.</p>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 actjs. MIT License.</span>
+    <span class="footer-meta">8 kB · 0 deps · SSR-first</span>
+  </div>
+</footer>
 
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
-        <table class="api-table">
-          <thead>
-            <tr>
-              <th>Export</th>
-              <th>Module</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>signal(init)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Fine-grained reactive value. Returns [getter, setter].</td>
-            </tr>
-            <tr>
-              <td>computed(fn)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Derived signal. Lazy, auto-tracks dependencies.</td>
-            </tr>
-            <tr>
-              <td>globalSignal(key, init)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Keyed singleton signal — shared across all callers with same key.</td>
-            </tr>
-            <tr>
-              <td>component(setup, opts?)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Define a stateful component. Setup runs once; render re-runs on signal change.</td>
-            </tr>
-            <tr>
-              <td>defineComponent</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Alias for component().</td>
-            </tr>
-            <tr>
-              <td>onInit(fn)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Lifecycle — runs on server AND client during setup.</td>
-            </tr>
-            <tr>
-              <td>onMount(fn)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Lifecycle — client only, after first render.</td>
-            </tr>
-            <tr>
-              <td>onDestroy(fn)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Lifecycle — client only, on app.destroy().</td>
-            </tr>
-            <tr>
-              <td>useHead(config)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Set title, meta, link tags. SSR streams them; client patches &lt;head&gt;.</td>
-            </tr>
-            <tr>
-              <td>resource(fn)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Async data source. Reactive — re-fetches when signal deps change.</td>
-            </tr>
-            <tr>
-              <td>Suspense</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Streaming boundary. Shows fallback while resource() loads.</td>
-            </tr>
-            <tr>
-              <td>h(tag, props, ...children)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Core hyperscript. String tag → DOM element; function → component call.</td>
-            </tr>
-            <tr>
-              <td>el.*</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Proxy sugar: el.button(...) === h('button', ...).</td>
-            </tr>
-            <tr>
-              <td>Fragment</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>&lt;&gt;&lt;/&gt; in JSX. Returns DocumentFragment.</td>
-            </tr>
-            <tr>
-              <td>ref()</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Returns { current: null }. Populated by h() after render.</td>
-            </tr>
-            <tr>
-              <td>html``</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Tagged template → DocumentFragment. Functions auto-bind as listeners.</td>
-            </tr>
-            <tr>
-              <td>createApp(sel, opts?)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>App factory. mount(), destroy(), criticalCSS, safe timers.</td>
-            </tr>
-            <tr>
-              <td>createRouter(routes, opts?)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Component factory that renders matched route reactively.</td>
-            </tr>
-            <tr>
-              <td>navigate(to)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Programmatic navigation. Updates path signal + history.</td>
-            </tr>
-            <tr>
-              <td>Link(props)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Declarative &lt;a&gt; that calls navigate() on click.</td>
-            </tr>
-            <tr>
-              <td>currentPath()</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Reactive getter for current pathname.</td>
-            </tr>
-            <tr>
-              <td>params()</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Reactive getter for current route params: { slug: 'hello' }.</td>
-            </tr>
-            <tr>
-              <td>query()</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Reactive getter for URL query string as key-value map.</td>
-            </tr>
-            <tr>
-              <td>matchRoute(pattern, path)</td>
-              <td><span class="d-tag orange">actjs</span></td>
-              <td>Match a route pattern. Returns params or null.</td>
-            </tr>
-            <tr>
-              <td>renderToString(component)</td>
-              <td><span class="d-tag purple">actjs/server</span></td>
-              <td>SSR — returns HTML string. Awaits resource() calls.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<!-- ─── Scroll fade-in observer ──────────────────────────────────────────── -->
+<script>
+(function () {
+  var els = document.querySelectorAll('.fade-up');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(function (el) { el.classList.add('visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
 
-  <!-- ─── Comparison ────────────────────────────────────────────────────────── -->
-  <section class="section" id="compare">
-    <div class="container">
-      <div class="section-label">Why actjs</div>
-      <h2 class="section-title">How it stacks up</h2>
+<!-- ─── actjs components ──────────────────────────────────────────────────── -->
+<script type="module" src="./main.tsx"></script>
 
-      <div style="overflow-x:auto;margin-top:2rem">
-        <table class="cmp-table">
-          <thead>
-            <tr>
-              <th style="text-align:left">Feature</th>
-              <th class="cmp-col-act">actjs</th>
-              <th>React</th>
-              <th>Vue</th>
-              <th>Svelte</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Fine-grained signals</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-            </tr>
-            <tr>
-              <td>No virtual DOM</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-yes">Yes</td>
-            </tr>
-            <tr>
-              <td>Works in &lt;script&gt; tags (IIFE)</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-no">Partial</td>
-              <td class="cmp-no">No</td>
-            </tr>
-            <tr>
-              <td>Per-component hydration strategy</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-no">No</td>
-            </tr>
-            <tr>
-              <td>Built-in router</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-no">External</td>
-              <td class="cmp-no">External</td>
-              <td class="cmp-no">External</td>
-            </tr>
-            <tr>
-              <td>JSX support</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-            </tr>
-            <tr>
-              <td>Zero runtime dependencies</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-no">No</td>
-              <td class="cmp-yes">Yes</td>
-            </tr>
-            <tr>
-              <td>SSR + streaming</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-              <td class="cmp-yes">Yes</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── Footer ────────────────────────────────────────────────────────────── -->
-  <footer>
-    <div class="container">
-      <div class="logo">actjs</div>
-      <p>Reactive UI without the runtime. MIT License.</p>
-    </div>
-  </footer>
-
-  <!-- ─── actjs module entry ──────────────────────────────────────────────────── -->
-  <script type="module" src="./main.tsx"></script>
 </body>
-
 </html>

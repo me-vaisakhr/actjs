@@ -1,33 +1,33 @@
-import { component, globalSignal, createApp } from 'actjs';
+import { component, createApp } from 'actjs';
+import { themeMode, setThemeMode, applyTheme, type ThemeMode } from '../themeStore.js';
 
-const THEMES = ['light', 'dark', 'system'] as const;
+const MODES: ThemeMode[] = ['dark', 'light', 'system'];
 
+// ComponentA — reads + writes the shared theme signal
 const ComponentA = component(() => {
-  const [theme, setTheme] = globalSignal<string>('landing-theme', 'light');
-
   const cycle = () => {
-    const next = THEMES[(THEMES.indexOf(theme() as typeof THEMES[number]) + 1) % THEMES.length];
-    setTheme(next!);
+    const next = MODES[(MODES.indexOf(themeMode()) + 1) % MODES.length]!;
+    setThemeMode(next);
+    applyTheme(next);
   };
 
   return () => (
     <div class="gs-card gs-card-mb">
-      <div class="gs-sublabel">ComponentA</div>
+      <div class="gs-sublabel">ComponentA — writes theme</div>
       <div class="gs-header">
-        <span class="gs-mono">{theme()}</span>
-        <button type="button" class="d-btn" onClick={cycle}>cycle</button>
+        <span class="gs-mono">{themeMode()}</span>
+        <button type="button" class="d-btn" onClick={cycle}>Change</button>
       </div>
     </div>
   );
 }, { hydrate: 'interactive' });
 
+// ComponentB — read-only mirror of the same signal
 const ComponentB = component(() => {
-  const [theme] = globalSignal<string>('landing-theme', 'light');
-
   return () => (
     <div class="gs-card">
       <div class="gs-sublabel">ComponentB — reads same signal</div>
-      <div class="gs-mono-b">{theme()}</div>
+      <div class="gs-mono-b">{themeMode()}</div>
     </div>
   );
 }, { hydrate: 'interactive' });
