@@ -1,6 +1,21 @@
 import type { Child, Props, Ref } from './types.js';
 import { elListeners } from './listeners.js';
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// Tags that must be created in the SVG namespace.
+// These are unambiguously SVG-only; shared tags (a, title, script, style, image, text)
+// default to HTML to preserve existing behaviour.
+const SVG_TAGS = new Set([
+  'svg', 'path', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'rect',
+  'g', 'defs', 'use', 'symbol', 'tspan', 'textPath', 'foreignObject',
+  'clipPath', 'mask', 'pattern', 'linearGradient', 'radialGradient', 'stop',
+  'filter', 'feBlend', 'feColorMatrix', 'feComposite', 'feFlood',
+  'feGaussianBlur', 'feMerge', 'feMergeNode', 'feOffset', 'feTurbulence',
+  'animate', 'animateTransform', 'animateMotion', 'mpath', 'set',
+  'marker', 'view', 'desc', 'metadata',
+]);
+
 /** Flatten nested Child arrays into a single flat array. */
 function flattenChildren(children: Child[]): Array<string | number | boolean | null | undefined | Element | DocumentFragment> {
   const result: Array<string | number | boolean | null | undefined | Element | DocumentFragment> = [];
@@ -39,7 +54,9 @@ export function h(
     return result ?? document.createDocumentFragment();
   }
 
-  const el = document.createElement(tag);
+  const el = SVG_TAGS.has(tag)
+    ? document.createElementNS(SVG_NS, tag)
+    : document.createElement(tag);
 
   if (props) {
     let listeners: ReturnType<typeof elListeners.get> | undefined;
