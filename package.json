@@ -7,7 +7,7 @@
   "module": "./dist/actjs.esm.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "actjs-dev": "./bin/actjs-dev.js"
+    "actjs": "./bin/actjs.js"
   },
   "exports": {
     ".": {
@@ -24,7 +24,12 @@
       "import": "./dist/actjs.server.esm.js"
     }
   },
-  "files": ["dist", "bin", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
   "unpkg": "./dist/actjs.iife.js",
   "jsdelivr": "./dist/actjs.iife.js",
   "sideEffects": false,
@@ -33,30 +38,38 @@
     "ws": "^8.18.0"
   },
   "scripts": {
-    "build": "vite build && vite build --config vite.iife.config.ts",
+    "build": "vite build && vite build --config vite.iife.config.ts && node scripts/patch-jsx-runtime-dts.mjs",
     "build:dev": "node scripts/build-dev.mjs",
+    "build:create": "node scripts/build-create.mjs",
+    "build:all": "npm run build && npm run build:dev && npm run build:create",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src tests",
     "format": "prettier --write src tests",
-    "dev:counter": "node bin/actjs-dev.js --entry examples/counter/index.html --port 3000",
-    "dev:todo": "node bin/actjs-dev.js --entry examples/todo/index.html --port 3001",
-    "dev:blog": "node bin/actjs-dev.js --entry examples/blog/index.html --port 3002",
-    "dev:landing": "node bin/actjs-dev.js --entry examples/landing/index.html --port 3003"
+    "dev:counter": "node bin/actjs.js --entry examples/counter/index.html --port 3000",
+    "dev:todo": "node bin/actjs.js --entry examples/todo/index.html --port 3001",
+    "dev:blog": "node bin/actjs.js --entry examples/blog/index.html --port 3002",
+    "dev:landing": "node bin/actjs.js --entry examples/landing/index.html --port 3003"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/ws": "^8.5.0",
-    "@vitest/coverage-v8": "^2.0.0",
-    "happy-dom": "^14.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "happy-dom": "^20.8.3",
     "typescript": "^5.5.0",
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.0.0",
-    "vitest": "^2.0.0"
+    "vitest": "^4.0.18"
   },
-  "keywords": ["frontend", "signals", "ssr", "islands", "reactive"],
+  "keywords": [
+    "frontend",
+    "signals",
+    "ssr",
+    "islands",
+    "reactive"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

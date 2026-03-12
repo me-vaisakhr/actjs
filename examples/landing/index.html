@@ -259,6 +259,71 @@
       font-size: 0.85rem;
     }
 
+    .hero-steps {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .hero-steps .step {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-steps .step-n {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hero-steps code {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.75rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .hero-steps .step-sep {
+      color: var(--border);
+      font-size: 0.8rem;
+    }
+
+    .hero-steps .step-note {
+      color: var(--muted);
+      font-size: 0.72rem;
+      margin-left: 0.25rem;
+    }
+
+    .hero-dev-note {
+      margin-top: 0.5rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .hero-dev-note code {
+      color: var(--muted);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+    }
+
     /* ─── Feature strip ─────────────────────────────────────────────────────── */
     .features-strip {
       border-top: 1px solid var(--border);
@@ -1002,9 +1067,17 @@
         <a href="#api" class="btn btn-secondary">Full API reference</a>
       </div>
       <div class="hero-install">
-        <code>npm install actjs</code>
-        <span>or just drop in a &lt;script&gt; tag</span>
+        <code>npx actjs create my-app</code>
+        <span>scaffold a new project in seconds</span>
       </div>
+      <div class="hero-steps">
+        <span class="step"><span class="step-n">1</span><code>npx actjs create my-app</code></span>
+        <span class="step-sep">→</span>
+        <span class="step"><span class="step-n">2</span><code>cd my-app</code></span>
+        <span class="step-sep">→</span>
+        <span class="step"><span class="step-n">3</span><code>npm run build</code><span class="step-note">opens dist/index.html directly</span></span>
+      </div>
+      <p class="hero-dev-note">For hot reload during development: <code>npm run dev</code></p>
     </div>
   </section>
 

@@ -6,6 +6,7 @@ import { Builder } from './builder.js';
 import { FileWatcher } from './watcher.js';
 import { HmrServer } from './hmr.js';
 import { transformHtml } from './html.js';
+import { runBuild, runPreview } from './build-command.js';
 
 // ─── MIME types ──────────────────────────────────────────────────────────────
 
@@ -83,11 +84,25 @@ function createHandler(
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 export async function startDevServer(argv: string[]): Promise<void> {
+  // Dispatch subcommands
+  if (argv[0] === 'build') {
+    await runBuild(argv.slice(1));
+    return;
+  }
+  if (argv[0] === 'preview') {
+    await runPreview(argv.slice(1));
+    return;
+  }
+  // `actjs dev [options]` — strip the explicit 'dev' keyword and fall through
+  if (argv[0] === 'dev') {
+    argv = argv.slice(1);
+  }
+
   const { values } = parseArgs({
     args: argv,
     options: {
       entry: { type: 'string', default: 'index.html' },
-      port:  { type: 'string', default: '3000' },
+      port:  { type: 'string', default: '3410' },
     },
     strict: false,
   });
@@ -98,7 +113,7 @@ export async function startDevServer(argv: string[]): Promise<void> {
   const projectRoot = path.dirname(entryHtml);
 
   if (!fs.existsSync(entryHtml)) {
-    console.error(`[actjs-dev] Entry not found: ${entryHtml}`);
+    console.error(`[actjs] Entry not found: ${entryHtml}`);
     process.exit(1);
   }
 
@@ -124,12 +139,12 @@ export async function startDevServer(argv: string[]): Promise<void> {
       const result = await builder.rebuild();
       jsContent  = result.js;
       mapContent = result.map;
-      console.log(`[actjs-dev] Built ${entryScript}`);
+      console.log(`[actjs] Built ${entryScript}`);
     } catch (err) {
-      console.error('[actjs-dev] Initial build failed:', err);
+      console.error('[actjs] Initial build failed:', err);
     }
   } else {
-    console.warn('[actjs-dev] No <script type="module" src="..."> found — serving static HTML only.');
+    console.warn('[actjs] No <script type="module" src="..."> found — serving static HTML only.');
   }
 
   // HTTP server
@@ -153,28 +168,44 @@ export async function startDevServer(argv: string[]): Promise<void> {
   if (builder) {
     watcher.onChange(async () => {
       try {
+        // Re-read HTML in case index.html itself changed
+        const latestRaw = fs.readFileSync(entryHtml, 'utf-8');
+        htmlContent = transformHtml(latestRaw).html;
+
         const result = await builder.rebuild();
         jsContent  = result.js;
         mapContent = result.map;
         watcher.updateFromMetafile(result.watchedFiles);
         hmr.broadcast({ type: 'reload' });
-        console.log(`[actjs-dev] Rebuilt — reloading browser`);
+        console.log(`[actjs] Rebuilt — reloading browser`);
       } catch (err) {
-        console.error('[actjs-dev] Rebuild failed:', err);
+        console.error('[actjs] Rebuild failed:', err);
+      }
+    });
+  } else {
+    // No JS entry — watch HTML-only changes and reload
+    watcher.onChange(() => {
+      try {
+        const latestRaw = fs.readFileSync(entryHtml, 'utf-8');
+        htmlContent = transformHtml(latestRaw).html;
+        hmr.broadcast({ type: 'reload' });
+        console.log(`[actjs] HTML changed — reloading browser`);
+      } catch (err) {
+        console.error('[actjs] Failed to reload HTML:', err);
       }
     });
   }
 
   // Start listening
   server.listen(port, () => {
-    console.log(`\n  actjs-dev  →  http://localhost:${port}\n`);
+    console.log(`\n  actjs  →  http://localhost:${port}\n`);
   });
 
   server.on('error', (err: NodeJS.ErrnoException) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`[actjs-dev] Port ${port} is in use. Try: actjs-dev --port ${port + 1}`);
+      console.error(`[actjs] Port ${port} is in use. Try: npm run dev -- --port ${port + 1}`);
     } else {
-      console.error('[actjs-dev] Server error:', err.message);
+      console.error('[actjs] Server error:', err.message);
     }
     process.exit(1);
   });
@@ -184,7 +215,7 @@ export async function startDevServer(argv: string[]): Promise<void> {
   const shutdown = () => {
     if (shuttingDown) return;
     shuttingDown = true;
-    console.log('\n[actjs-dev] Shutting down...');
+    console.log('\n[actjs] Shutting down...');
     watcher.close();
     server.closeAllConnections?.(); // Node 18.2+ — drops keep-alive & WS connections
     server.close();

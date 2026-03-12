@@ -24,3 +24,9 @@
 
 /* ─── ResourceDemo ────────────────────────────────────────────────────────── */
 .d-value-error { color: var(--red); border-color: rgba(255, 69, 69, 0.25); background: rgba(255, 69, 69, 0.06); }
+
+/* ─── RefDemo ─────────────────────────────────────────────────────────────── */
+.ref-scroll-box  { height: 130px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
+.ref-scroll-item { padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; color: var(--muted); }
+.ref-scroll-item:last-child { border-bottom: none; }
+.ref-value-mt    { margin-top: 0.5rem; }

@@ -43,7 +43,25 @@
 
 ---
 
-## Install
+## Scaffold a new project
+
+```bash
+npx create-actjs-app my-app        # TypeScript (default)
+npx create-actjs-app my-app --template javascript
+
+cd my-app
+npm install
+
+npm run build   # production build → dist/index.html (opens without a server)
+npm run dev     # dev server with hot reload → http://localhost:3000
+```
+
+> **`npm run build` first** — produces a self-contained `dist/index.html` you can open directly.
+> Use `npm run dev` when you need live hot reload during development.
+
+---
+
+## Install (existing project)
 
 ```bash
 npm install actjs
