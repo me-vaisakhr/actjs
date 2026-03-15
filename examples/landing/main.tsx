@@ -12,6 +12,7 @@ import { RefDemo }          from './components/RefDemo';
 import { ElDemo }           from './components/ElDemo';
 import { RouterDemo }       from './components/RouterDemo';
 import { ResourceDemo }     from './components/ResourceDemo';
+import { DepsDemo }         from './components/DepsDemo';
 
 createApp('#theme-toggle-mount').mount(ThemeToggle);
 createApp('#hero-demo').mount(HeroDemo);
@@ -25,3 +26,4 @@ createApp('#ref-preview').mount(RefDemo);
 createApp('#el-preview').mount(ElDemo);
 createApp('#router-preview').mount(RouterDemo);
 createApp('#resource-preview').mount(ResourceDemo);
+createApp('#deps-preview').mount(DepsDemo);

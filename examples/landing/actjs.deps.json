@@ -1,0 +1,6 @@
+{
+  "provider": "jsdelivr",
+  "packages": {
+    "animate.css": "4.1.1"
+  }
+}

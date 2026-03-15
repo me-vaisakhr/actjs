@@ -84,6 +84,24 @@ export interface RouterOptions {
   base?: string;
 }
 
+// ─── Loader ───────────────────────────────────────────────────────────────────
+
+export interface LoadScriptOptions {
+  type?: 'text/javascript' | 'module';
+  async?: boolean;
+  defer?: boolean;
+  crossOrigin?: 'anonymous' | 'use-credentials';
+  integrity?: string;
+  noModule?: boolean;
+  id?: string;
+}
+
+export interface LoadStylesheetOptions {
+  media?: string;
+  crossOrigin?: 'anonymous' | 'use-credentials';
+  integrity?: string;
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export interface CreateAppOptions {

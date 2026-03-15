@@ -91,6 +91,7 @@
         <li><a href="#components">Components</a></li>
         <li><a href="#router">Router</a></li>
         <li><a href="#async">Async</a></li>
+        <li><a href="#external-packages">Packages</a></li>
         <li><a href="#get-started">Get Started</a></li>
         <li><a href="#api">API</a></li>
       </ul>
@@ -441,12 +442,106 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-     06 — GET STARTED
+     06 — EXTERNAL PACKAGES
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section id="external-packages" class="section-wrap fade-up" aria-labelledby="external-packages-heading">
+  <div class="container">
+    <div class="section-eyebrow">
+      <span class="section-num">06</span>
+      <span class="section-tag">External Packages</span>
+    </div>
+    <h2 class="section-title" id="external-packages-heading">CDN deps, declarative and zero-config.</h2>
+    <p class="section-sub">
+      Declare external packages in <code>actjs.deps.json</code>. The CLI resolves versions from npm,
+      the Vite plugin injects import maps at build time, and <code>useDeps()</code> loads them at runtime
+      for script-tag users — all from the same config file.
+    </p>
+
+    <div class="demo-grid">
+      <!-- CLI + deps.json -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">actjs add — declare deps</span>
+          <span class="demo-card-tag">cli</span>
+        </div>
+        <div class="demo-card-body">
+          <div class="code-block"><span class="cm"># resolves latest version from npm registry</span>
+<span class="kw">actjs</span> add lodash
+<span class="kw">actjs</span> add bootstrap@5.3.3
+
+<span class="cm">// actjs.deps.json (auto-generated)</span>
+<span class="pn">{</span>
+  <span class="str">"provider"</span>: <span class="str">"esm.sh"</span>,
+  <span class="str">"packages"</span>: <span class="pn">{</span>
+    <span class="str">"lodash"</span>: <span class="str">"4.17.21"</span>,
+    <span class="str">"bootstrap"</span>: <span class="str">"5.3.3"</span>
+  <span class="pn">}</span>
+<span class="pn">}</span></div>
+        </div>
+      </article>
+
+      <!-- Vite plugin -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">actjsPlugin() — build-time</span>
+          <span class="demo-card-tag amber">vite</span>
+        </div>
+        <div class="demo-card-body">
+          <div class="code-block"><span class="cm">// vite.config.ts</span>
+<span class="kw">import</span> <span class="pn">{</span> actjsPlugin <span class="pn">}</span> <span class="kw">from</span> <span class="str">'actjs/vite'</span>
+
+<span class="kw">export default</span> <span class="fn">defineConfig</span>(<span class="pn">{</span>
+  plugins: [<span class="fn">actjsPlugin</span>()],
+<span class="pn">}</span>)
+
+<span class="cm">// then import by bare name — no URL needed</span>
+<span class="kw">import</span> _ <span class="kw">from</span> <span class="str">'lodash'</span>
+<span class="cm">// ↑ resolved via injected import map</span></div>
+        </div>
+      </article>
+
+      <!-- useDeps() live demo -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">useDeps() — runtime (IIFE)</span>
+          <span class="demo-card-tag pink">live demo</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="deps-preview"></div>
+        </div>
+      </article>
+
+      <!-- Providers -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">CDN providers</span>
+          <span class="demo-card-tag green">config</span>
+        </div>
+        <div class="demo-card-body">
+          <div class="code-block"><span class="cm">// esm.sh (default) — ESM + tree-shaking</span>
+<span class="str">"provider"</span>: <span class="str">"esm.sh"</span>
+<span class="cm">// → https://esm.sh/lodash@4.17.21</span>
+
+<span class="cm">// jsDelivr</span>
+<span class="str">"provider"</span>: <span class="str">"jsdelivr"</span>
+<span class="cm">// → cdn.jsdelivr.net/npm/lodash@4.17.21/+esm</span>
+
+<span class="cm">// unpkg</span>
+<span class="str">"provider"</span>: <span class="str">"unpkg"</span>
+<span class="cm">// → unpkg.com/lodash@4.17.21?module</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     07 — GET STARTED
      ═══════════════════════════════════════════════════════════════════════ -->
 <section id="get-started" class="section-wrap fade-up" aria-labelledby="getstarted-heading">
   <div class="container">
     <div class="section-eyebrow">
-      <span class="section-num">06</span>
+      <span class="section-num">07</span>
       <span class="section-tag">Get Started</span>
     </div>
     <h2 class="section-title" id="getstarted-heading">Three ways to start.</h2>

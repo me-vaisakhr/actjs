@@ -9,6 +9,7 @@ export default defineConfig({
         index: 'src/index.ts',
         'jsx-runtime': 'src/jsx-runtime.ts',
         server: 'src/hydration.ts',
+        'vite-plugin': 'src/vite-plugin.ts',
       },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => {
@@ -23,6 +24,10 @@ export default defineConfig({
         }
         return `${entryName}.${format === 'es' ? 'js' : 'cjs.js'}`;
       },
+    },
+    rollupOptions: {
+      // Externalize Node.js built-ins and vite (used by vite-plugin entry only)
+      external: ['vite', 'node:fs', 'node:path'],
     },
     target: 'es2018',
     sourcemap: true,

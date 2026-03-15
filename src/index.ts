@@ -37,3 +37,13 @@ export {
   currentPath,
   matchRoute,
 } from './router.js';
+
+export type { LoadScriptOptions, LoadStylesheetOptions } from './types.js';
+export type { ActDepsConfig, CdnProvider } from './deps.js';
+export {
+  loadScript,
+  loadStylesheet,
+  defineImportMap,
+  preloadResource,
+  useDeps,
+} from './loader.js';

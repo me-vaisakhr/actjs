@@ -39,6 +39,7 @@
 | **`resource()` + `Suspense`** | Async data loading with streaming fallback. |
 | **JSX support** | React 17+ automatic transform via `actjs/jsx-runtime`. |
 | **`el.*` hyperscript** | `el.button(...)` — no-build syntax for script-tag users. |
+| **External packages** | `actjs add lodash` — declare CDN deps in `actjs.deps.json`. Works from npm or jsDelivr/esm.sh/unpkg. |
 | **Zero dependencies** | No `dependencies` in package.json. Ever. |
 
 ---
@@ -267,6 +268,108 @@ app.destroy(); // cleans timers, styles, calls onDestroy
 
 ---
 
+## External packages
+
+actjs supports two ways to use external packages like lodash, bootstrap, or tailwind.
+
+### Option A — npm install (bundled projects)
+
+Standard npm workflow. Vite handles bundling automatically.
+
+```bash
+npm install lodash bootstrap
+```
+
+```ts
+import _ from 'lodash'
+import 'bootstrap/dist/css/bootstrap.min.css'
+```
+
+### Option B — CDN (no bundler / IIFE users)
+
+Declare deps in `actjs.deps.json` — the CLI resolves versions from npm and actjs loads them from CDN.
+
+```bash
+actjs add lodash          # resolves latest from npm registry
+actjs add bootstrap@5.3.3 # pinned version
+```
+
+This creates/updates `actjs.deps.json`:
+
+```json
+{
+  "provider": "esm.sh",
+  "packages": {
+    "lodash": "4.17.21",
+    "bootstrap": "5.3.3"
+  }
+}
+```
+
+Supported CDN providers: `"esm.sh"` (default, ESM + tree-shaking), `"jsdelivr"`, `"unpkg"`.
+
+#### With Vite (build-time — recommended)
+
+Add the plugin to your `vite.config.ts`. It reads `actjs.deps.json` and automatically injects an import map + stylesheet links into your HTML and externalizes packages from the bundle.
+
+```ts
+import { actjsPlugin } from 'actjs/vite'
+
+export default defineConfig({
+  plugins: [actjsPlugin()],
+})
+```
+
+Your code then imports packages by name — no URL needed:
+
+```ts
+import _ from 'lodash'  // resolved via the injected import map
+```
+
+#### Runtime loading (IIFE / no bundler)
+
+For script-tag users, call `useDeps()` before mounting your app:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/actjs/dist/actjs.iife.js"></script>
+<script type="module">
+  const { useDeps, createApp, component, signal, el } = actjs;
+
+  await useDeps({
+    provider: 'esm.sh',
+    packages: { lodash: '4.17.21', bootstrap: '5.3.3' }
+  });
+
+  // Bootstrap CSS is injected, lodash is available via import map
+  createApp('#root').mount(MyApp);
+</script>
+```
+
+You can also use the lower-level helpers directly:
+
+```ts
+import { loadScript, loadStylesheet, defineImportMap, preloadResource } from 'actjs';
+
+// Load a stylesheet
+await loadStylesheet('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
+
+// Load a script
+await loadScript('https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js');
+
+// Set up an import map for ESM bare imports
+defineImportMap({ lodash: 'https://esm.sh/lodash@4.17.21' });
+
+// Preload hint for the browser
+preloadResource('https://esm.sh/lodash@4.17.21', 'script');
+```
+
+All helpers are:
+- **SSR-safe** — no-op when `document` is undefined
+- **Idempotent** — the same URL is never injected twice even with concurrent callers
+- **Tree-shakeable** — unused helpers add zero bytes to your bundle
+
+---
+
 ## Build outputs
 
 | File | Use |
@@ -276,6 +379,7 @@ app.destroy(); // cleans timers, styles, calls onDestroy
 | `dist/actjs.iife.js` | Script tag — `<script src="...">` |
 | `dist/jsx-runtime.js` | JSX transform (auto-imported by TypeScript) |
 | `dist/actjs.server.esm.js` | SSR — `renderToString()` |
+| `dist/vite-plugin.js` | Vite plugin — `import { actjsPlugin } from 'actjs/vite'` |
 
 ---
 
@@ -284,6 +388,7 @@ app.destroy(); // cleans timers, styles, calls onDestroy
 - [Counter](examples/counter/index.html) — IIFE build, no tooling
 - [Blog](examples/blog/index.html) — island architecture (static header, interactive like buttons, lazy newsletter)
 - [Todo](examples/todo/index.html) — signals, computed, list rendering
+- [Landing](examples/landing/index.html) — full landing page with components
 
 ---
 

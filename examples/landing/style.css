@@ -1530,6 +1530,119 @@ html[data-theme="light"] .tt-btn.active {
   font-family: var(--font-mono);
 }
 
+/* ─── DepsDemo ────────────────────────────────────────────────────────── */
+.deps-stage {
+  position: relative;
+  height: 130px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: border-color 0.4s, background 0.4s;
+}
+
+.deps-stage-ready {
+  border-color: rgba(167, 139, 250, 0.4);
+  background: radial-gradient(ellipse at 50% 120%, rgba(167, 139, 250, 0.08) 0%, transparent 70%),
+              var(--bg3);
+}
+
+.deps-stage-label {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.65rem;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.55;
+}
+
+.deps-stage-label-after {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* The big interactive button inside the stage */
+.deps-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: none; /* no smooth transition by default */
+}
+
+/* Boring snap — scale instantly, no easing */
+.deps-btn-snap {
+  transform: scale(0.93);
+}
+
+/* After library loads — glowing, inviting */
+.deps-btn-loaded {
+  background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(244,114,182,0.12));
+  border-color: rgba(167, 139, 250, 0.5);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deps-btn-loaded:hover {
+  background: linear-gradient(135deg, rgba(167,139,250,0.28), rgba(244,114,182,0.2));
+  transform: scale(1.03);
+}
+
+.deps-btn-loaded:active {
+  transform: scale(0.97);
+}
+
+.deps-btn-emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+/* Load button */
+.deps-load-btn {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.deps-hint {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.deps-error {
+  margin-top: 0.5rem;
+}
+
+.deps-loaded-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+.deps-check {
+  color: var(--green, #34d399);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 .d-value-error {
   color: var(--red);
   border-color: rgba(240, 101, 101, 0.25);
