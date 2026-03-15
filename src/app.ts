@@ -8,6 +8,15 @@ import type { ActApp, CreateAppOptions, Props } from './types.js';
  * Central app factory. Resolves container, mounts root component,
  * and provides cleanup on destroy().
  * Lifecycle hooks (onInit/onMount/onDestroy) are run by component() itself.
+ *
+ * @example
+ * const app = createApp('#root').mount(MyComponent);
+ *
+ * // With hydration (SSR rehydration — reconciles instead of replacing):
+ * createApp('#root', { hydrate: true }).mount(MyComponent);
+ *
+ * // Cleanup all timers, CSS, and onDestroy hooks:
+ * app.destroy();
  */
 export function createApp(
   container: string | Element,

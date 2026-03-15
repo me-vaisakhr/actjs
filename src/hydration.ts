@@ -5,6 +5,12 @@ import type { Props } from './types.js';
  * Render a component to an HTML string (SSR).
  * Runs setup and onInit hooks; serializes DOM to string.
  * Does NOT run onMount or onDestroy — those are client-only.
+ *
+ * @example
+ * import { renderToString } from 'actjs/ssr';
+ * const html = await renderToString(MyPage, { userId: '42' });
+ * // Returns: '<div data-component="">...</div>'
+ * // Prepends useHead() output (title, meta, link tags) when present.
  */
 export async function renderToString(
   componentFn: (props?: Props) => Element | void,

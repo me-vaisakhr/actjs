@@ -16,6 +16,10 @@ const pendingLoads = new Map<string, Promise<void>>();
  * Dynamically inject a <script> tag and resolve when loaded.
  * Subsequent calls with the same URL return immediately (idempotent).
  * No-ops on the server (SSR).
+ *
+ * @example
+ * await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js');
+ * window.confetti({ particleCount: 150, spread: 70 });
  */
 export function loadScript(url: string, opts?: LoadScriptOptions): Promise<void> {
   if (typeof document === 'undefined') return Promise.resolve();
@@ -55,6 +59,9 @@ export function loadScript(url: string, opts?: LoadScriptOptions): Promise<void>
  * Dynamically inject a <link rel="stylesheet"> and resolve when loaded.
  * Subsequent calls with the same href return immediately (idempotent).
  * No-ops on the server (SSR).
+ *
+ * @example
+ * await loadStylesheet('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
  */
 export function loadStylesheet(href: string, opts?: LoadStylesheetOptions): Promise<void> {
   if (typeof document === 'undefined') return Promise.resolve();

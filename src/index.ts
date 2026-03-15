@@ -17,6 +17,8 @@ export type {
   ActApp,
   Route,
   RouterOptions,
+  CSSProperties,
+  JSXEventHandlers,
 } from './types.js';
 
 export { signal, computed } from './signal.js';

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// actjs CLI — create, dev, build, preview, and add.
+// actjs CLI — create, dev, build, preview, add, and remove.
 // Compiled output lives at dist/ after `npm run build:dev` / `npm run build:create`.
 
 import { fileURLToPath } from 'node:url';
@@ -8,6 +8,33 @@ import { join, dirname } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
+
+// `actjs --version`
+if (argv[0] === '--version' || argv[0] === '-v') {
+  const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
+  console.log(pkg.version);
+  process.exit(0);
+}
+
+// `actjs --help`
+if (argv[0] === '--help' || argv[0] === '-h' || argv.length === 0) {
+  console.log(`
+  actjs — SSR-first frontend framework
+
+  Usage:
+    actjs dev                   Start Vite dev server
+    actjs build                 Production build
+    actjs preview               Preview production build
+    actjs create <name>         Scaffold a new project
+      --template typescript     TypeScript template (default)
+      --template javascript     JavaScript template
+    actjs add <pkg>[@version]   Add a CDN dependency to actjs.deps.json
+    actjs remove <pkg>          Remove a CDN dependency from actjs.deps.json
+    actjs --version             Print version
+    actjs --help                Print this help
+  `);
+  process.exit(0);
+}
 
 // `actjs add <package>[@version]` — add a CDN dependency to actjs.deps.json
 if (argv[0] === 'add') {
@@ -55,6 +82,36 @@ if (argv[0] === 'add') {
   deps.packages[pkg] = version;
   writeFileSync(depsPath, JSON.stringify(deps, null, 2) + '\n');
   console.log(`[actjs] Added ${pkg}@${version} → actjs.deps.json`);
+  process.exit(0);
+}
+
+// `actjs remove <package>` — remove a CDN dependency from actjs.deps.json
+if (argv[0] === 'remove') {
+  const pkg = argv[1];
+  if (!pkg) {
+    console.error('[actjs] Usage: actjs remove <package>');
+    process.exit(1);
+  }
+
+  const depsPath = join(process.cwd(), 'actjs.deps.json');
+  if (!existsSync(depsPath)) {
+    console.error('[actjs] No actjs.deps.json found in current directory');
+    process.exit(1);
+  }
+  let deps;
+  try {
+    deps = JSON.parse(readFileSync(depsPath, 'utf-8'));
+  } catch {
+    console.error('[actjs] Could not parse actjs.deps.json');
+    process.exit(1);
+  }
+  if (!deps.packages || !(pkg in deps.packages)) {
+    console.error(`[actjs] Package "${pkg}" not found in actjs.deps.json`);
+    process.exit(1);
+  }
+  delete deps.packages[pkg];
+  writeFileSync(depsPath, JSON.stringify(deps, null, 2) + '\n');
+  console.log(`[actjs] Removed ${pkg} from actjs.deps.json`);
   process.exit(0);
 }
 

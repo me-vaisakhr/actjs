@@ -184,7 +184,8 @@ export function createRouter(
           }
         }
 
-        // No match — return empty div (user should add a '*' catch-all)
+        // No match — warn in dev and return empty div (user should add a '*' catch-all)
+        console.warn(`[actjs] router: no route matched "${normalized}" — add a { path: '*', component: NotFound } catch-all.`);
         return document.createElement('div');
       };
     },

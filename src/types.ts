@@ -84,6 +84,57 @@ export interface RouterOptions {
   base?: string;
 }
 
+// ─── JSX Helpers ──────────────────────────────────────────────────────────────
+
+/**
+ * Typed CSS properties for the `style` prop. Accepts any valid CSS property
+ * name as a key and a string or number as the value.
+ *
+ * @example
+ * const boxStyle: CSSProperties = { color: 'red', fontSize: '1rem' };
+ * return () => <div style={boxStyle}>Hello</div>;
+ */
+export type CSSProperties = Record<string, string | number>;
+
+/**
+ * Typed event handler props for common DOM events.
+ * Use when you need strict typing on event handler arguments.
+ *
+ * @example
+ * const MyInput = component<JSXEventHandlers>(() => {
+ *   return () => (
+ *     <input
+ *       onInput={(e: InputEvent) => console.log((e.target as HTMLInputElement).value)}
+ *     />
+ *   );
+ * });
+ */
+export interface JSXEventHandlers {
+  onClick?:     (e: MouseEvent)    => void;
+  onDblClick?:  (e: MouseEvent)    => void;
+  onMouseDown?: (e: MouseEvent)    => void;
+  onMouseUp?:   (e: MouseEvent)    => void;
+  onMouseMove?: (e: MouseEvent)    => void;
+  onMouseOver?: (e: MouseEvent)    => void;
+  onMouseOut?:  (e: MouseEvent)    => void;
+  onInput?:     (e: InputEvent)    => void;
+  onChange?:    (e: Event)         => void;
+  onSubmit?:    (e: SubmitEvent)   => void;
+  onKeyDown?:   (e: KeyboardEvent) => void;
+  onKeyUp?:     (e: KeyboardEvent) => void;
+  onKeyPress?:  (e: KeyboardEvent) => void;
+  onFocus?:     (e: FocusEvent)    => void;
+  onBlur?:      (e: FocusEvent)    => void;
+  onScroll?:    (e: Event)         => void;
+  onWheel?:     (e: WheelEvent)    => void;
+  onDragStart?: (e: DragEvent)     => void;
+  onDragEnd?:   (e: DragEvent)     => void;
+  onDrop?:      (e: DragEvent)     => void;
+  onTouchStart?:(e: TouchEvent)    => void;
+  onTouchEnd?:  (e: TouchEvent)    => void;
+  onTouchMove?: (e: TouchEvent)    => void;
+}
+
 // ─── Loader ───────────────────────────────────────────────────────────────────
 
 export interface LoadScriptOptions {

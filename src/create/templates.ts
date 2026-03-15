@@ -80,6 +80,37 @@ function sharedPackageJson(name: string, binCmd: string, actjsDep?: string): str
 
 const sharedGitignore = 'node_modules\ndist\n';
 
+function sharedViteConfig(): string {
+  return `import { defineConfig } from 'vite';
+import { actjsPlugin } from 'actjs/vite';
+
+export default defineConfig({
+  plugins: [actjsPlugin()],
+});
+`;
+}
+
+function sharedReadme(name: string): string {
+  return `# ${name}
+
+A project built with [actjs](https://github.com/vaisakhrkrishnan/actjs) — a lightweight, SSR-first frontend framework.
+
+## Getting started
+
+\`\`\`sh
+npm install
+npm run dev
+\`\`\`
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| \`npm run dev\` | Start development server with hot reload |
+| \`npm run build\` | Production build to \`dist/\` |
+`;
+}
+
 // ─── TypeScript template ──────────────────────────────────────────────────────
 
 export function tsTemplate(name: string, binCmd: string, actjsDep?: string): Record<string, string> {
@@ -159,9 +190,11 @@ createApp('#root').mount(App);
 }
 `,
 
-    'style.css':    sharedStyleCss(),
-    'package.json': sharedPackageJson(name, binCmd, actjsDep),
-    '.gitignore':   sharedGitignore,
+    'vite.config.ts': sharedViteConfig(),
+    'README.md':      sharedReadme(name),
+    'style.css':      sharedStyleCss(),
+    'package.json':   sharedPackageJson(name, binCmd, actjsDep),
+    '.gitignore':     sharedGitignore,
   };
 }
 
@@ -226,8 +259,10 @@ const App = component(() => {
 createApp('#root').mount(App);
 `,
 
-    'style.css':    sharedStyleCss(),
-    'package.json': sharedPackageJson(name, binCmd, actjsDep),
-    '.gitignore':   sharedGitignore,
+    'vite.config.js': sharedViteConfig(),
+    'README.md':      sharedReadme(name),
+    'style.css':      sharedStyleCss(),
+    'package.json':   sharedPackageJson(name, binCmd, actjsDep),
+    '.gitignore':     sharedGitignore,
   };
 }

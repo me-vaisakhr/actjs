@@ -14,6 +14,12 @@ export function getCurrentObserver(): Effect | null {
 /**
  * Fine-grained signal. Calling getter() inside a tracking context
  * auto-subscribes the observer to this signal.
+ *
+ * @example
+ * const [count, setCount] = signal(0);
+ * setCount(1);               // set directly
+ * setCount(n => n + 1);      // updater function
+ * console.log(count());      // 2
  */
 export function signal<T>(initialValue: T): Signal<T> {
   let value = initialValue;
@@ -49,6 +55,14 @@ export function signal<T>(initialValue: T): Signal<T> {
  * Derived signal. Lazily re-computes when any tracked dependency changes.
  * Reading computed() inside a tracking context also subscribes the observer
  * to this computed's upstream dependencies.
+ *
+ * @example
+ * const [first, setFirst] = signal('Ada');
+ * const [last,  setLast]  = signal('Lovelace');
+ * const full = computed(() => `${first()} ${last()}`);
+ * console.log(full()); // 'Ada Lovelace'
+ * setFirst('Grace');
+ * console.log(full()); // 'Grace Lovelace'
  */
 export function computed<T>(fn: () => T): () => T {
   let cachedValue: T;

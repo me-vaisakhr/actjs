@@ -15,6 +15,16 @@ export const DESTROY_KEY: unique symbol = Symbol('actjs.destroy');
  * setup() runs ONCE — call signal(), onInit(), onMount(), onDestroy(), useHead() here.
  * setup() returns a render fn that re-runs when any subscribed signal changes.
  * options.hydrate controls island strategy (default: 'static').
+ *
+ * @example
+ * const Counter = component(() => {
+ *   const [count, setCount] = signal(0);
+ *   return () => (
+ *     <button onClick={() => setCount(n => n + 1)}>
+ *       Clicked {count()} times
+ *     </button>
+ *   );
+ * }, { hydrate: 'interactive' });
  */
 export function component<P extends object = object>(
   setup: (props: P & ComponentProps<P>) => RenderFn,
@@ -67,6 +77,9 @@ export function component<P extends object = object>(
       let result: ReturnType<RenderFn>;
       try {
         result = renderFn();
+      } catch (err) {
+        console.error('[actjs] render error:', err);
+        throw err;
       } finally {
         setCurrentObserver(prev);
       }
@@ -89,8 +102,10 @@ export function component<P extends object = object>(
 
     function initAndMount(): void {
       doRender();
-      // Run onInit (server + client)
-      void Promise.all(ctx.onInitFns.map((fn) => fn()));
+      // Run onInit (server + client) — log errors to console so they're never silently swallowed
+      Promise.all(ctx.onInitFns.map((fn) => fn())).catch((err) => {
+        console.error('[actjs] onInit error:', err);
+      });
       // Run onMount (client only — skip during SSR)
       if (!isSSRMode()) {
         queueMicrotask(() => {
