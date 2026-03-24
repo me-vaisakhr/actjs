@@ -1,4 +1,4 @@
-import { component, ref, onMount } from 'actjs';
+import { component, ref, onMount } from 'js-act';
 
 export const RefDemo = component(() => {
   const listRef    = ref<HTMLDivElement>();

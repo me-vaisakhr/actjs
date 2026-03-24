@@ -9,7 +9,7 @@ export default defineConfig({
   root: r(example),
   esbuild: {
     // Use actjs automatic JSX runtime for all .tsx files
-    jsxImportSource: 'actjs',
+    jsxImportSource: 'js-act',
     jsx: 'automatic',
   },
   resolve: {

@@ -1,4 +1,4 @@
-import { component, signal, onInit, onMount, onDestroy } from 'actjs';
+import { component, signal, onInit, onMount, onDestroy } from 'js-act';
 
 interface LogEntry {
   type: 'init' | 'mount' | 'destroy';

@@ -1,4 +1,4 @@
-import { component, signal, computed } from 'actjs';
+import { component, signal, computed } from 'js-act';
 
 interface Item {
   id: number;

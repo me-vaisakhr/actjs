@@ -1,4 +1,4 @@
-import { component, onMount } from 'actjs';
+import { component, onMount } from 'js-act';
 import { themeMode, setThemeMode, applyTheme, type ThemeMode } from '../themeStore.js';
 
 export const ThemeToggle = component(() => {

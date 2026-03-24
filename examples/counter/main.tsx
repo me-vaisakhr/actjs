@@ -1,4 +1,4 @@
-import { component, signal, computed, onMount, onDestroy, createApp } from 'actjs';
+import { component, signal, computed, onMount, onDestroy, createApp } from 'js-act';
 
 const Counter = component(() => {
   const [count, setCount] = signal(0);

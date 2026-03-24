@@ -1,4 +1,4 @@
-import { component, signal, createApp } from 'actjs';
+import { component, signal, createApp } from 'js-act';
 
 // ─── Static island — ships zero JS ───────────────────────────────────────────
 const Header = component(() => {

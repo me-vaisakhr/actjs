@@ -1,4 +1,4 @@
-import { component, signal, computed, createApp } from 'actjs';
+import { component, signal, computed, createApp } from 'js-act';
 
 interface Todo {
   id: number;

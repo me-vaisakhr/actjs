@@ -1,4 +1,4 @@
-import { component, signal, el } from 'actjs';
+import { component, signal, el } from 'js-act';
 
 const COLORS = ['#c9ff33', '#33aaff', '#ff4545', '#33ff99', '#f97316'];
 

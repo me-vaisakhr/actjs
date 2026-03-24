@@ -1,5 +1,5 @@
-import { component, signal } from 'actjs';
-import { loadScript } from 'actjs';
+import { component, signal } from 'js-act';
+import { loadScript } from 'js-act';
 
 declare global {
   interface Window {

@@ -1,4 +1,4 @@
-import { component, createApp } from 'actjs';
+import { component, createApp } from 'js-act';
 import { themeMode, setThemeMode, applyTheme, type ThemeMode } from '../themeStore.js';
 
 const MODES: ThemeMode[] = ['dark', 'light', 'system'];

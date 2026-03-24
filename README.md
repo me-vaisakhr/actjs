@@ -1,8 +1,8 @@
-# actjs
+# js-act
 
-[![npm](https://img.shields.io/npm/v/actjs)](https://www.npmjs.com/package/actjs)
-[![jsdelivr](https://img.shields.io/jsdelivr/npm/hw/actjs)](https://www.jsdelivr.com/package/npm/actjs)
-[![license](https://img.shields.io/npm/l/actjs)](LICENSE)
+[![npm](https://img.shields.io/npm/v/js-act)](https://www.npmjs.com/package/js-act)
+[![jsdelivr](https://img.shields.io/jsdelivr/npm/hw/js-act)](https://www.jsdelivr.com/package/npm/js-act)
+[![license](https://img.shields.io/npm/l/js-act)](LICENSE)
 
 > Lightweight SSR-first frontend library with fine-grained signals and island architecture.
 
@@ -10,7 +10,7 @@
 
 ```html
 <!-- Zero build step — drop in and go -->
-<script src="https://cdn.jsdelivr.net/npm/actjs/dist/actjs.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-act/dist/actjs.iife.js"></script>
 <script>
   const { component, signal, el, createApp } = actjs;
 
@@ -37,7 +37,7 @@
 | **SSR-first** | `renderToString()` + streaming-ready. Works with any server framework. |
 | **`useHead()`** | Reactive `<title>/<meta>/<link>` management. SSR + client. |
 | **`resource()` + `Suspense`** | Async data loading with streaming fallback. |
-| **JSX support** | React 17+ automatic transform via `actjs/jsx-runtime`. |
+| **JSX support** | React 17+ automatic transform via `js-act/jsx-runtime`. |
 | **`el.*` hyperscript** | `el.button(...)` — no-build syntax for script-tag users. |
 | **External packages** | `actjs add lodash` — declare CDN deps in `actjs.deps.json`. Works from npm or jsDelivr/esm.sh/unpkg. |
 | **Zero dependencies** | No `dependencies` in package.json. Ever. |
@@ -65,13 +65,13 @@ npm run dev     # dev server with hot reload → http://localhost:3000
 ## Install (existing project)
 
 ```bash
-npm install actjs
+npm install js-act
 ```
 
 Or via CDN (no build step):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/actjs/dist/actjs.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-act/dist/actjs.iife.js"></script>
 ```
 
 ---
@@ -85,15 +85,15 @@ Or via CDN (no build step):
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "actjs"
+    "jsxImportSource": "js-act"
   }
 }
 ```
 
 ```tsx
 // counter.tsx
-import { component, signal, computed } from 'actjs';
-import { createApp } from 'actjs';
+import { component, signal, computed } from 'js-act';
+import { createApp } from 'js-act';
 
 const Counter = component(() => {
   const [count, setCount] = signal(0);
@@ -216,7 +216,7 @@ const HeavyWidget = component(() => ..., { hydrate: 'visible' });
 ### Router
 
 ```ts
-import { createRouter, navigate, Link, params, query } from 'actjs';
+import { createRouter, navigate, Link, params, query } from 'js-act';
 
 const App = createRouter([
   { path: '/',           component: Home },
@@ -245,7 +245,7 @@ Link({ href: '/blog/hello', children: 'Read more' });
 ### SSR
 
 ```ts
-import { renderToString } from 'actjs/server';
+import { renderToString } from 'js-act/server';
 
 const html = await renderToString(MyPage);
 // Returns: <title>...</title><main>...</main>
@@ -270,7 +270,7 @@ app.destroy(); // cleans timers, styles, calls onDestroy
 
 ## External packages
 
-actjs supports two ways to use external packages like lodash, bootstrap, or tailwind.
+js-act supports two ways to use external packages like lodash, bootstrap, or tailwind.
 
 ### Option A — npm install (bundled projects)
 
@@ -287,7 +287,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 ### Option B — CDN (no bundler / IIFE users)
 
-Declare deps in `actjs.deps.json` — the CLI resolves versions from npm and actjs loads them from CDN.
+Declare deps in `actjs.deps.json` — the CLI resolves versions from npm and js-act loads them from CDN.
 
 ```bash
 actjs add lodash          # resolves latest from npm registry
@@ -313,7 +313,7 @@ Supported CDN providers: `"esm.sh"` (default, ESM + tree-shaking), `"jsdelivr"`,
 Add the plugin to your `vite.config.ts`. It reads `actjs.deps.json` and automatically injects an import map + stylesheet links into your HTML and externalizes packages from the bundle.
 
 ```ts
-import { actjsPlugin } from 'actjs/vite'
+import { actjsPlugin } from 'js-act/vite'
 
 export default defineConfig({
   plugins: [actjsPlugin()],
@@ -331,7 +331,7 @@ import _ from 'lodash'  // resolved via the injected import map
 For script-tag users, call `useDeps()` before mounting your app:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/actjs/dist/actjs.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-act/dist/actjs.iife.js"></script>
 <script type="module">
   const { useDeps, createApp, component, signal, el } = actjs;
 
@@ -348,7 +348,7 @@ For script-tag users, call `useDeps()` before mounting your app:
 You can also use the lower-level helpers directly:
 
 ```ts
-import { loadScript, loadStylesheet, defineImportMap, preloadResource } from 'actjs';
+import { loadScript, loadStylesheet, defineImportMap, preloadResource } from 'js-act';
 
 // Load a stylesheet
 await loadStylesheet('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
@@ -379,7 +379,7 @@ All helpers are:
 | `dist/actjs.iife.js` | Script tag — `<script src="...">` |
 | `dist/jsx-runtime.js` | JSX transform (auto-imported by TypeScript) |
 | `dist/actjs.server.esm.js` | SSR — `renderToString()` |
-| `dist/vite-plugin.js` | Vite plugin — `import { actjsPlugin } from 'actjs/vite'` |
+| `dist/vite-plugin.js` | Vite plugin — `import { actjsPlugin } from 'js-act/vite'` |
 
 ---
 

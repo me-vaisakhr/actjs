@@ -1,4 +1,4 @@
-import { component, signal } from 'actjs';
+import { component, signal } from 'js-act';
 
 export const SignalCounter = component(() => {
   const [count, setCount] = signal(0);

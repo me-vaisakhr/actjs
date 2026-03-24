@@ -1,4 +1,4 @@
-import { globalSignal } from 'actjs';
+import { globalSignal } from 'js-act';
 
 export type ThemeMode = 'dark' | 'light' | 'system';
 

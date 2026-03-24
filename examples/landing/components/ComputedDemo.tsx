@@ -1,4 +1,4 @@
-import { component, signal, computed } from 'actjs';
+import { component, signal, computed } from 'js-act';
 
 export const ComputedDemo = component(() => {
   const [n, setN] = signal(4);

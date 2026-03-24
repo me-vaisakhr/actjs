@@ -1,4 +1,4 @@
-import { createApp } from 'actjs';
+import { createApp } from 'js-act';
 
 import { ThemeToggle }      from './components/ThemeToggle';
 import { HeroDemo }         from './components/HeroDemo';

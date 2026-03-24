@@ -1,4 +1,4 @@
-import { component, signal } from 'actjs';
+import { component, signal } from 'js-act';
 
 interface User {
   name: string;
