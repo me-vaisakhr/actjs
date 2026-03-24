@@ -1,13 +1,13 @@
 {
-  "name": "actjs",
-  "version": "0.1.0",
+  "name": "js-act",
+  "version": "1.0.0",
   "description": "Lightweight SSR-first frontend library with fine-grained signals and island architecture",
   "type": "module",
   "main": "./dist/actjs.cjs.js",
   "module": "./dist/actjs.esm.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "actjs": "./bin/actjs.js"
+    "actjs": "bin/actjs.js"
   },
   "exports": {
     ".": {
@@ -80,6 +80,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vaisakhrkrishnan/actjs"
+    "url": "git+https://github.com/vaisakhrkrishnan/actjs.git"
   }
 }

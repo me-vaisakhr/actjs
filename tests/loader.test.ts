@@ -65,8 +65,8 @@ function setupScriptMock() {
   });
 }
 
-function lastScript() {
-  return mockScripts[mockScripts.length - 1];
+function lastScript(): MockScript {
+  return mockScripts[mockScripts.length - 1]!;
 }
 
 afterEach(() => {

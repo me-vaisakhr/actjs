@@ -7,7 +7,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Plugin, HtmlTagDescriptor } from 'vite';
-import type { ActDepsConfig } from './types.js';
+import type { ActDepsConfig } from './deps.js';
 import { resolveUrl, resolveStylesheetUrl } from './deps.js';
 
 /**
