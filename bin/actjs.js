@@ -34,7 +34,8 @@ if (argv[0] === '--help' || argv[0] === '-h' || argv.length === 0) {
 
   Usage:
     actjs dev                   Start Vite dev server
-    actjs build                 Production build
+    actjs build                 Production build (multi-file, requires a server)
+    actjs build --inline        Production build (single self-contained index.html)
     actjs preview               Preview production build
     actjs create <name>         Scaffold a new project
       --template typescript     TypeScript template (default)

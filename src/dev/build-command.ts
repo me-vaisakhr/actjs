@@ -89,7 +89,11 @@ export async function runPreview(argv: string[]): Promise<void> {
 
 // ─── Entry-script regex (same as dev server) ─────────────────────────────────
 
+// Matches just the opening <script type="module" src="..."> tag (for standard mode, which keeps the closing </script>)
 const MODULE_SCRIPT_RE = /(<script[^>]+type=["']module["'][^>]+src=["'])([^"']+\.(?:ts|tsx|js|jsx))(["'][^>]*>)/i;
+
+// Matches the full element including the closing </script> (for inline mode, which emits its own closing tag)
+const MODULE_SCRIPT_FULL_RE = /<script[^>]+type=["']module["'][^>]*src=["'][^"']+\.(?:ts|tsx|js|jsx)["'][^>]*>\s*<\/script>/i;
 
 // ─── Resolve actjs src root (same logic as builder.ts) ───────────────────────
 
@@ -143,44 +147,66 @@ function copyStaticFiles(srcDir: string, destDir: string): void {
   }
 }
 
+// ─── CSS link inliner (used by --inline mode) ────────────────────────────────
+
+// Matches <link rel="stylesheet" href="..."> in either attribute order
+const LINK_STYLESHEET_RE = /<link\b([^>]*)>/gi;
+
+function inlineCss(html: string, projectRoot: string): string {
+  return html.replace(LINK_STYLESHEET_RE, (_full, attrs: string) => {
+    if (!/\brel=["']stylesheet["']/i.test(attrs)) return _full;
+    const hrefMatch = /\bhref=["']([^"']+)["']/i.exec(attrs);
+    if (!hrefMatch) return _full;
+    const href = hrefMatch[1]!;
+    // Leave absolute URLs / protocol-relative URLs as-is
+    if (/^(https?:)?\/\//i.test(href)) return _full;
+    const cssPath = path.resolve(projectRoot, href);
+    if (!fs.existsSync(cssPath)) return '';
+    const css = fs.readFileSync(cssPath, 'utf-8');
+    return `<style>${css}</style>`;
+  });
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export async function runBuild(argv: string[]): Promise<void> {
   const { values } = parseArgs({
     args: argv,
     options: {
-      entry: { type: 'string', default: 'index.html' },
-      out:   { type: 'string', default: 'dist' },
+      entry:  { type: 'string',  default: 'index.html' },
+      out:    { type: 'string',  default: 'dist' },
+      inline: { type: 'boolean', default: false },
     },
     strict: false,
   });
 
-  const entryArg    = values['entry'] as string;
-  const outArg      = values['out']   as string;
+  const entryArg    = values['entry']  as string;
+  const outArg      = values['out']    as string;
+  const doInline    = values['inline'] as boolean;
   const entryHtml   = path.resolve(entryArg);
   const projectRoot = path.dirname(entryHtml);
   const outDir      = path.resolve(outArg);
-  const assetsDir   = path.join(outDir, 'assets');
 
   if (!fs.existsSync(entryHtml)) {
     console.error(`[actjs] Entry not found: ${entryHtml}`);
     process.exit(1);
   }
 
-  console.log('[actjs] Building...');
+  console.log(doInline ? '[actjs] Building (inline mode)...' : '[actjs] Building...');
 
   const rawHtml = fs.readFileSync(entryHtml, 'utf-8');
   const match   = MODULE_SCRIPT_RE.exec(rawHtml);
 
-  fs.mkdirSync(outDir,    { recursive: true });
-  fs.mkdirSync(assetsDir, { recursive: true });
+  fs.mkdirSync(outDir, { recursive: true });
 
-  // ── Copy static assets first (CSS, images, fonts, …) ─────────────────────
-  // Must run before writing index.html so the modified HTML is not overwritten.
-  copyStaticFiles(projectRoot, outDir);
+  if (doInline) {
+    // ── Inline mode: single self-contained index.html ────────────────────────
+    if (!match) {
+      console.warn('[actjs] No <script type="module" src="..."> found — writing HTML as-is.');
+      fs.writeFileSync(path.join(outDir, 'index.html'), rawHtml, 'utf-8');
+      return;
+    }
 
-  // ── Bundle JS + write rewritten HTML ───────────────────────────────────────
-  if (match) {
     const entryScript = match[2]!;
     const entryPoint  = path.resolve(projectRoot, entryScript);
     const srcRoot     = resolveActjsSrcRoot();
@@ -188,8 +214,8 @@ export async function runBuild(argv: string[]): Promise<void> {
     const result = await esbuild.build({
       entryPoints: [entryPoint],
       bundle:   true,
-      write:    true,
-      outfile:  path.join(assetsDir, 'main.js'),
+      write:    false,
+      outfile:  'main.js',
       format:   'iife',
       platform: 'browser',
       jsx:      'automatic',
@@ -207,15 +233,59 @@ export async function runBuild(argv: string[]): Promise<void> {
       process.exit(1);
     }
 
-    const size = fs.statSync(path.join(assetsDir, 'main.js')).size;
-    console.log(`  assets/main.js   ${(size / 1024).toFixed(1)} kB`);
+    const jsText   = result.outputFiles?.[0]?.text ?? '';
+    // Inline CSS first, then replace the full <script type="module">…</script> with the bundled JS
+    let outHtml = inlineCss(rawHtml, projectRoot);
+    outHtml = outHtml.replace(MODULE_SCRIPT_FULL_RE, `<script>${jsText}</script>`);
 
-    // Replace module script with plain <script> — IIFE works on file:// without CORS
-    const outHtml = rawHtml.replace(MODULE_SCRIPT_RE, `<script src="./assets/main.js">`);
     fs.writeFileSync(path.join(outDir, 'index.html'), outHtml, 'utf-8');
+
+    const size = Buffer.byteLength(outHtml, 'utf-8');
+    console.log(`  index.html   ${(size / 1024).toFixed(1)} kB  (self-contained — no server needed)`);
   } else {
-    // No module script — HTML already copied as-is by copyStaticFiles above
-    console.warn('[actjs] No <script type="module" src="..."> found — copying HTML only.');
+    // ── Standard mode: chunked output ────────────────────────────────────────
+    const assetsDir = path.join(outDir, 'assets');
+    fs.mkdirSync(assetsDir, { recursive: true });
+
+    // Copy static assets first so the later index.html write wins
+    copyStaticFiles(projectRoot, outDir);
+
+    if (match) {
+      const entryScript = match[2]!;
+      const entryPoint  = path.resolve(projectRoot, entryScript);
+      const srcRoot     = resolveActjsSrcRoot();
+
+      const result = await esbuild.build({
+        entryPoints: [entryPoint],
+        bundle:   true,
+        write:    true,
+        outfile:  path.join(assetsDir, 'main.js'),
+        format:   'iife',
+        platform: 'browser',
+        jsx:      'automatic',
+        jsxImportSource: 'js-act',
+        sourcemap: false,
+        minify:   true,
+        target:   'es2018',
+        alias: buildAliases(srcRoot),
+        loader: { '.ts': 'ts', '.tsx': 'tsx' },
+        absWorkingDir: projectRoot,
+      });
+
+      if (result.errors.length > 0) {
+        console.error('[actjs] Build failed');
+        process.exit(1);
+      }
+
+      const size = fs.statSync(path.join(assetsDir, 'main.js')).size;
+      console.log(`  assets/main.js   ${(size / 1024).toFixed(1)} kB`);
+
+      // Replace module script with plain <script> — IIFE works on file:// without CORS
+      const outHtml = rawHtml.replace(MODULE_SCRIPT_RE, `<script src="./assets/main.js">`);
+      fs.writeFileSync(path.join(outDir, 'index.html'), outHtml, 'utf-8');
+    } else {
+      console.warn('[actjs] No <script type="module" src="..."> found — copying HTML only.');
+    }
   }
 
   console.log(`\n  Built to ${path.relative(process.cwd(), outDir)}/\n`);

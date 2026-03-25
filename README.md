@@ -24,7 +24,8 @@ npm run dev        # → http://localhost:3410
 TypeScript by default. Add `--template javascript` for plain JS.
 
 ```bash
-npm run build      # → dist/index.html (opens without a server)
+npm run build                  # → dist/ (requires a local server)
+npx actjs build --inline       # → dist/index.html (single file, opens without a server)
 ```
 
 > Requires Node.js 20+.
@@ -172,7 +173,8 @@ const html = await renderToString(MyPage);
 ```bash
 actjs create <name>          # scaffold a new project
 actjs dev                    # dev server with HMR
-actjs build                  # production build
+actjs build                  # production build (multi-file, needs a server)
+actjs build --inline         # single self-contained index.html (double-click to open)
 actjs preview                # preview the build
 actjs add <pkg>[@version]    # add a CDN dependency
 actjs remove <pkg>           # remove a CDN dependency
