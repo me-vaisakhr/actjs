@@ -122,12 +122,28 @@ export function useInterval(fn: () => void, ms: number): void {
  * Schedules a one-shot timeout when the component mounts and cancels it
  * automatically if the component is destroyed before it fires. Client-only.
  *
+ * Returns a `retrigger` function that resets the timer from event handlers —
+ * each call cancels the pending timeout and starts a fresh one.
+ *
  * @example
+ * // Fire once at mount
  * useTimeout(() => setVisible(false), 3000);
+ *
+ * // Re-trigger on user activity (debounce pattern)
+ * const resetIdle = useTimeout(() => setIdle(true), 5000);
+ * return () => <div onMouseMove={resetIdle}>...</div>;
  */
-export function useTimeout(fn: () => void, ms: number): void {
+export function useTimeout(fn: () => void, ms: number): () => void {
   const ctx = assertInSetup('useTimeout');
   let id: ReturnType<typeof setTimeout>;
+
+  function retrigger(): void {
+    clearTimeout(id);
+    id = setTimeout(fn, ms);
+  }
+
   ctx.onMountFns.push(() => { id = setTimeout(fn, ms); });
   ctx.onDestroyFns.push(() => clearTimeout(id));
+
+  return retrigger;
 }

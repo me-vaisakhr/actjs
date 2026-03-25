@@ -36,9 +36,12 @@ export function component<P extends object = object>(
   return function mountComponent(props?: P & ComponentProps<P>): Element {
     const mergedProps = (props ?? {}) as P & ComponentProps<P>;
 
-    // Container element for this component instance
+    // Container element for this component instance.
+    // display:contents makes it invisible to CSS layout — children behave as
+    // if they're direct children of the parent (h-full, flexbox, grid all work).
     const container = document.createElement('div');
     container.setAttribute('data-component', '');
+    container.style.display = 'contents';
     if (hydrateStrategy !== 'static') {
       container.setAttribute('data-hydrate', hydrateStrategy);
     }
