@@ -1,6 +1,6 @@
 {
   "name": "js-act",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lightweight SSR-first frontend library with fine-grained signals and island architecture",
   "type": "module",
   "main": "./dist/actjs.cjs.js",

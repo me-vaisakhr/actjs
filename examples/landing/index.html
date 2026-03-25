@@ -364,6 +364,17 @@
         </div>
       </article>
 
+      <!-- Timer hooks -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-card-title">useInterval / useTimeout</span>
+          <span class="demo-card-tag amber">lifecycle</span>
+        </div>
+        <div class="demo-card-body">
+          <div id="timer-preview"></div>
+        </div>
+      </article>
+
       <!-- Ref -->
       <article class="demo-card">
         <div class="demo-card-header">
@@ -848,6 +859,18 @@ app.<span class="fn">get</span>(<span class="str">'/'</span>, <span class="kw">a
             <td><span class="api-name">onDestroy</span></td>
             <td><span class="api-sig">onDestroy(fn: () → void) → void</span></td>
             <td class="api-desc">Runs when the component is removed from the DOM.</td>
+            <td><span class="api-badge lifecycle">lifecycle</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">useInterval</span></td>
+            <td><span class="api-sig">useInterval(fn: () → void, ms: number) → void</span></td>
+            <td class="api-desc">Starts a repeating interval on mount. Cleared automatically on destroy.</td>
+            <td><span class="api-badge lifecycle">lifecycle</span></td>
+          </tr>
+          <tr>
+            <td><span class="api-name">useTimeout</span></td>
+            <td><span class="api-sig">useTimeout(fn: () → void, ms: number) → void</span></td>
+            <td class="api-desc">Schedules a one-shot timeout on mount. Cancelled automatically on destroy.</td>
             <td><span class="api-badge lifecycle">lifecycle</span></td>
           </tr>
           <tr>

@@ -197,6 +197,21 @@ const MyComp = component(() => {
 });
 ```
 
+### Component-level timers
+
+`useInterval` and `useTimeout` start on mount and clean up automatically on destroy — no app reference needed.
+
+```ts
+const Clock = component(() => {
+  const [tick, setTick] = signal(0);
+
+  useInterval(() => setTick(t => t + 1), 1000); // repeating — auto-clears on destroy
+  useTimeout(() => setTick(0), 10_000);          // one-shot — auto-cancels on destroy
+
+  return () => <p>Tick: {tick()}</p>;
+}, { hydrate: 'interactive' });
+```
+
 ### Head management (SEO)
 
 ```ts
