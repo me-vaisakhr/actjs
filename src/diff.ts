@@ -1,4 +1,22 @@
 import { elListeners } from './listeners.js';
+import { componentDestroyRegistry } from './component-registry.js';
+
+/**
+ * Walk a subtree and call onDestroy callbacks for any component containers
+ * found within it. Called before a node is removed or replaced in the DOM.
+ */
+function destroyComponentTree(node: Node): void {
+  if (node.nodeType !== Node.ELEMENT_NODE) return;
+  const el = node as Element;
+  const fns = componentDestroyRegistry.get(el);
+  if (fns) {
+    for (const fn of fns) fn();
+    componentDestroyRegistry.delete(el);
+  }
+  for (const child of Array.from(el.childNodes)) {
+    destroyComponentTree(child);
+  }
+}
 
 /**
  * Reconcile DOM children of `parent` against `newContent`.
@@ -26,6 +44,7 @@ export function reconcileChildren(
     if (oldNode === undefined && newNode !== undefined) {
       parent.appendChild(newNode); // move directly — preserves event listeners
     } else if (oldNode !== undefined && newNode === undefined) {
+      destroyComponentTree(oldNode);
       parent.removeChild(oldNode);
     } else if (oldNode !== undefined && newNode !== undefined) {
       patchNode(parent, oldNode, newNode);
@@ -53,7 +72,8 @@ function patchNode(parent: Node, oldNode: ChildNode, newNode: Node): void {
     return;
   }
 
-  // Different type or tag — replace with the new node directly (preserves listeners)
+  // Different type or tag — destroy any components in the old subtree, then replace
+  destroyComponentTree(oldNode);
   parent.replaceChild(newNode, oldNode);
 }
 
@@ -111,6 +131,7 @@ function reconcileChildNodes(oldEl: Element, newEl: Element): void {
     if (!oldChild && newChild) {
       oldEl.appendChild(newChild); // move directly — preserves event listeners
     } else if (oldChild && !newChild) {
+      destroyComponentTree(oldChild);
       oldEl.removeChild(oldChild);
     } else if (oldChild && newChild) {
       patchNode(oldEl, oldChild, newChild);

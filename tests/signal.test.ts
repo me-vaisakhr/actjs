@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { signal, computed, setCurrentObserver, getCurrentObserver } from '../src/signal.js';
+import { signal, computed, batch, setCurrentObserver, getCurrentObserver } from '../src/signal.js';
 import type { Effect } from '../src/types.js';
 
 describe('signal', () => {
@@ -97,6 +97,102 @@ describe('signal', () => {
     expect(getCurrentObserver()).toBe(effect);
     setCurrentObserver(null);
     expect(getCurrentObserver()).toBeNull();
+  });
+});
+
+describe('signal equality option', () => {
+  it('uses custom equals fn — skips notification when equal', () => {
+    const run = vi.fn();
+    const [arr, setArr] = signal([1, 2], {
+      equals: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+    });
+    const eff: Effect = { run, deps: new Set() };
+    setCurrentObserver(eff);
+    arr();
+    setCurrentObserver(null);
+
+    setArr([1, 2]); // same contents — should not notify
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it('uses custom equals fn — notifies when not equal', () => {
+    const run = vi.fn();
+    const [arr, setArr] = signal([1, 2], {
+      equals: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+    });
+    const eff: Effect = { run, deps: new Set() };
+    setCurrentObserver(eff);
+    arr();
+    setCurrentObserver(null);
+
+    setArr([1, 3]); // different — should notify
+    expect(run).toHaveBeenCalledOnce();
+  });
+
+  it('equals: false always notifies even for same value', () => {
+    const run = vi.fn();
+    const [count, setCount] = signal(0, { equals: false });
+    const eff: Effect = { run, deps: new Set() };
+    setCurrentObserver(eff);
+    count();
+    setCurrentObserver(null);
+
+    setCount(0); // same value — but equals: false means always notify
+    expect(run).toHaveBeenCalledOnce();
+  });
+});
+
+describe('batch', () => {
+  it('defers notifications until batch completes', () => {
+    const [a, setA] = signal(0);
+    const [b, setB] = signal(0);
+    const run = vi.fn();
+    const eff: Effect = { run, deps: new Set() };
+
+    setCurrentObserver(eff);
+    a(); b(); // subscribe to both
+    setCurrentObserver(null);
+
+    batch(() => {
+      setA(1);
+      setB(1);
+    });
+
+    // Both writes coalesced — effect ran once
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it('notifies each change separately without batch', () => {
+    const [a, setA] = signal(0);
+    const [b, setB] = signal(0);
+    const run = vi.fn();
+    const eff: Effect = { run, deps: new Set() };
+
+    setCurrentObserver(eff);
+    a(); b();
+    setCurrentObserver(null);
+
+    setA(1);
+    setB(1);
+
+    expect(run).toHaveBeenCalledTimes(2);
+  });
+
+  it('supports nested batches', () => {
+    const [a, setA] = signal(0);
+    const run = vi.fn();
+    const eff: Effect = { run, deps: new Set() };
+
+    setCurrentObserver(eff);
+    a();
+    setCurrentObserver(null);
+
+    batch(() => {
+      batch(() => { setA(1); });
+      setA(2);
+    });
+
+    expect(run).toHaveBeenCalledTimes(1);
   });
 });
 

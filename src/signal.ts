@@ -3,12 +3,60 @@ import type { Effect, Signal } from './types.js';
 // The currently-executing Effect (render fn or computed). null = not tracking.
 let currentObserver: Effect | null = null;
 
+// ─── Batch ────────────────────────────────────────────────────────────────────
+
+let batchDepth = 0;
+const pendingEffects = new Set<Effect>();
+
+/**
+ * Run multiple signal writes as a single atomic update.
+ * All effects and renders triggered inside fn() are deferred until the batch
+ * completes, so each subscriber fires at most once.
+ *
+ * @example
+ * batch(() => {
+ *   setPrice(newPrice);    // ← would each trigger a render separately
+ *   setVolume(newVolume);  // ← now both are coalesced into one render
+ * });
+ */
+export function batch(fn: () => void): void {
+  batchDepth++;
+  try {
+    fn();
+  } finally {
+    batchDepth--;
+    if (batchDepth === 0) {
+      // Drain pending effects — snapshot first so mutations during run are safe
+      const toRun = [...pendingEffects];
+      pendingEffects.clear();
+      for (const eff of toRun) eff.run();
+    }
+  }
+}
+
 export function setCurrentObserver(observer: Effect | null): void {
   currentObserver = observer;
 }
 
 export function getCurrentObserver(): Effect | null {
   return currentObserver;
+}
+
+export interface SignalOptions<T> {
+  /**
+   * Custom equality function. If it returns true the setter is a no-op and
+   * no subscribers are notified.
+   * Pass `false` to disable equality checks entirely (always notify).
+   *
+   * @default Object.is
+   * @example
+   * // Deep-equal arrays — only re-render when contents actually change
+   * const [items, setItems] = signal([], { equals: (a, b) => JSON.stringify(a) === JSON.stringify(b) });
+   *
+   * // Always notify (useful for objects mutated in place)
+   * const [state, setState] = signal(obj, { equals: false });
+   */
+  equals?: ((a: T, b: T) => boolean) | false;
 }
 
 /**
@@ -21,9 +69,11 @@ export function getCurrentObserver(): Effect | null {
  * setCount(n => n + 1);      // updater function
  * console.log(count());      // 2
  */
-export function signal<T>(initialValue: T): Signal<T> {
+export function signal<T>(initialValue: T, options?: SignalOptions<T>): Signal<T> {
   let value = initialValue;
   const subscribers: Set<Effect> = new Set();
+  const equalsFn: ((a: T, b: T) => boolean) | false =
+    options?.equals === false ? false : (options?.equals ?? Object.is);
 
   const getter = (): T => {
     if (currentObserver !== null) {
@@ -39,12 +89,16 @@ export function signal<T>(initialValue: T): Signal<T> {
         ? (newValue as (prev: T) => T)(value)
         : newValue;
 
-    if (Object.is(next, value)) return;
+    if (equalsFn !== false && equalsFn(next, value)) return;
     value = next;
 
     // Snapshot subscribers before notifying — effects may add/remove during run
     for (const effect of [...subscribers]) {
-      effect.run();
+      if (batchDepth > 0) {
+        pendingEffects.add(effect);
+      } else {
+        effect.run();
+      }
     }
   };
 

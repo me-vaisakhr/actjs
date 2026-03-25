@@ -22,9 +22,10 @@ export type {
   SVGProps,
 } from './types.js';
 
-export { signal, computed } from './signal.js';
+export { signal, computed, batch } from './signal.js';
+export type { SignalOptions } from './signal.js';
 export { globalSignal } from './global-signal.js';
-export { onInit, onMount, onDestroy, useInterval, useTimeout } from './lifecycle.js';
+export { onInit, onMount, onDestroy, effect, useInterval, useTimeout } from './lifecycle.js';
 export { useHead } from './head.js';
 export { resource, Suspense } from './resource.js';
 export { h, el, ref, Fragment } from './hyperscript.js';

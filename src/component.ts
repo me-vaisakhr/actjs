@@ -6,6 +6,7 @@ import { makeScheduler } from './scheduler.js';
 import { isSSRMode, setSSRHeadOutput } from './ssr-context.js';
 import type { ComponentOptions, ComponentProps, RenderFn } from './types.js';
 import type { Effect } from './types.js';
+import { componentDestroyRegistry } from './component-registry.js';
 
 /** Symbol key used to attach onDestroyFns to a component container. */
 export const DESTROY_KEY: unique symbol = Symbol('actjs.destroy');
@@ -57,6 +58,8 @@ export function component<P extends object = object>(
 
     // Attach destroy fns so app.ts can clean up
     (container as unknown as Record<symbol, Array<() => void>>)[DESTROY_KEY] = ctx.onDestroyFns;
+    // Register in shared registry so the DOM reconciler can call destroy when removing
+    componentDestroyRegistry.set(container, ctx.onDestroyFns);
 
     // The Effect that re-runs render when signals change
     const renderEffect: Effect = {

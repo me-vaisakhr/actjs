@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
-import { onInit, onMount, onDestroy, useInterval, useTimeout } from '../src/lifecycle.js';
+import { onInit, onMount, onDestroy, effect, useInterval, useTimeout } from '../src/lifecycle.js';
 import { setCurrentSetup, createSetupContext } from '../src/context.js';
+import { signal } from '../src/signal.js';
 
 afterEach(() => {
   setCurrentSetup(null);
@@ -133,6 +134,79 @@ describe('lifecycle hooks', () => {
 
     it('throws when called outside setup', () => {
       expect(() => useTimeout(() => {}, 1000)).toThrow('useTimeout() must be called inside a component setup function.');
+    });
+  });
+
+  describe('effect', () => {
+    it('runs immediately and tracks signal deps', () => {
+      const [count, setCount] = signal(0);
+      const spy = vi.fn();
+      const dispose = effect(() => { spy(count()); });
+      expect(spy).toHaveBeenCalledWith(0);
+      setCount(1);
+      expect(spy).toHaveBeenCalledWith(1);
+      expect(spy).toHaveBeenCalledTimes(2);
+      dispose();
+    });
+
+    it('stops reacting after dispose', () => {
+      const [count, setCount] = signal(0);
+      const spy = vi.fn();
+      const dispose = effect(() => { spy(count()); });
+      dispose();
+      setCount(99);
+      expect(spy).toHaveBeenCalledTimes(1); // only the initial run
+    });
+
+    it('calls cleanup fn before re-running', () => {
+      const [count, setCount] = signal(0);
+      const cleanup = vi.fn();
+      effect(() => {
+        count(); // track
+        return cleanup;
+      });
+      setCount(1);
+      expect(cleanup).toHaveBeenCalledTimes(1);
+      setCount(2);
+      expect(cleanup).toHaveBeenCalledTimes(2);
+    });
+
+    it('calls cleanup fn on dispose', () => {
+      const [count] = signal(0);
+      const cleanup = vi.fn();
+      const dispose = effect(() => {
+        count();
+        return cleanup;
+      });
+      dispose();
+      expect(cleanup).toHaveBeenCalledTimes(1);
+    });
+
+    it('auto-disposes when inside a component setup on destroy', () => {
+      const [count, setCount] = signal(0);
+      const spy = vi.fn();
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      effect(() => { spy(count()); });
+      setCurrentSetup(null);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      // Simulate component destroy
+      for (const fn of ctx.onDestroyFns) fn();
+      setCount(99);
+      expect(spy).toHaveBeenCalledTimes(1); // no more calls after destroy
+    });
+
+    it('re-entry guard prevents infinite loops', () => {
+      const [count, setCount] = signal(0);
+      const spy = vi.fn();
+      const dispose = effect(() => {
+        spy(count());
+        if (count() < 3) setCount(c => c + 1); // would loop without guard
+      });
+      // Should run at most once per signal change, not infinitely
+      expect(spy.mock.calls.length).toBeLessThanOrEqual(5);
+      dispose();
     });
   });
 
