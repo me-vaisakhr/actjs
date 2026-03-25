@@ -2,6 +2,17 @@
 // actjs CLI — create, dev, build, preview, add, and remove.
 // Compiled output lives at dist/ after `npm run build:dev` / `npm run build:create`.
 
+// ─── Node version check ───────────────────────────────────────────────────────
+const [major] = process.versions.node.split('.').map(Number);
+if (major < 20) {
+  console.error(
+    `[actjs] Node.js ${process.versions.node} is not supported.\n` +
+    `        js-act requires Node.js 20 or later.\n` +
+    `        Please upgrade: https://nodejs.org/en/download`
+  );
+  process.exit(1);
+}
+
 import { fileURLToPath } from 'node:url';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';

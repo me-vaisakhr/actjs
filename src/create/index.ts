@@ -28,7 +28,7 @@ function resolveActjsBin(actjsRoot: string, target: string): { binCmd: string; a
   const pkgPath = path.join(actjsRoot, 'package.json');
   try {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')) as { name?: string };
-    if (pkg.name === 'actjs') {
+    if (pkg.name === 'js-act') {
       const relBin = path.relative(target, path.join(actjsRoot, 'bin', 'actjs.js')).replace(/\\/g, '/');
       return { binCmd: `node ${relBin}` };
     }
@@ -36,21 +36,6 @@ function resolveActjsBin(actjsRoot: string, target: string): { binCmd: string; a
   return { binCmd: 'actjs', actjsDep: 'latest' };
 }
 
-/**
- * Copy all .d.ts files from actjs dist/ into <target>/vendor/actjs/.
- * These provide IDE/TypeScript type support right away, before npm install.
- */
-function copyActjsTypes(actjsRoot: string, target: string): void {
-  const distDir   = path.join(actjsRoot, 'dist');
-  const vendorDir = path.join(target, 'vendor', 'actjs');
-  fs.mkdirSync(vendorDir, { recursive: true });
-
-  for (const entry of fs.readdirSync(distDir)) {
-    if (entry.endsWith('.d.ts')) {
-      fs.copyFileSync(path.join(distDir, entry), path.join(vendorDir, entry));
-    }
-  }
-}
 
 export function runCreate(argv: string[]): void {
   const { positionals, values } = parseArgs({
@@ -62,21 +47,22 @@ export function runCreate(argv: string[]): void {
     strict: false,
   });
 
-  const name = positionals[0];
-  if (!name) {
-    console.error('Usage: create-actjs-app <project-name> [--template typescript|javascript]');
+  const rawName = positionals[0];
+  if (!rawName) {
+    console.error('Usage: actjs create <project-name> [--template typescript|javascript]');
     process.exit(1);
   }
 
-  // Validate project name (no path separators or special chars)
-  if (!/^[a-z0-9@._/-]+$/i.test(name)) {
-    console.error(`[create-actjs-app] Invalid project name: "${name}"`);
+  // Slugify: lowercase, replace spaces/underscores with hyphens, strip anything else invalid
+  const name = rawName.trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9@._/-]/g, '');
+  if (!name) {
+    console.error(`[actjs create] Could not derive a valid directory name from: "${rawName}"`);
     process.exit(1);
   }
 
   const template = (values['template'] as string).toLowerCase() as Template;
   if (!VALID_TEMPLATES.includes(template)) {
-    console.error(`[create-actjs-app] Unknown template "${template}". Available: ${VALID_TEMPLATES.join(', ')}`);
+    console.error(`[actjs create] Unknown template "${template}". Available: ${VALID_TEMPLATES.join(', ')}`);
     process.exit(1);
   }
 
@@ -90,18 +76,13 @@ export function runCreate(argv: string[]): void {
 
   const { binCmd, actjsDep } = resolveActjsBin(actjsRoot, target);
   const files = template === 'javascript'
-    ? jsTemplate(name, binCmd, actjsDep)
-    : tsTemplate(name, binCmd, actjsDep);
+    ? jsTemplate(name, rawName, binCmd, actjsDep)
+    : tsTemplate(name, rawName, binCmd, actjsDep);
 
   for (const [filePath, content] of Object.entries(files)) {
     const abs = path.join(target, filePath);
     fs.mkdirSync(path.dirname(abs), { recursive: true });
     fs.writeFileSync(abs, content, 'utf-8');
-  }
-
-  // Pre-copy actjs type declarations so TypeScript/IDE works before npm install
-  if (template === 'typescript') {
-    copyActjsTypes(actjsRoot, target);
   }
 
   console.log(`\n  Created ${name} (${template})\n`);

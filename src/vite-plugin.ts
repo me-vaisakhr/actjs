@@ -36,9 +36,18 @@ export function actjsPlugin(): Plugin {
     },
 
     config() {
-      if (!deps) return {};
+      // Always wire up the JSX transform so `vite dev` works out of the box
+      // without requiring jsxImportSource in tsconfig or vite.config manually.
+      const base = {
+        esbuild: {
+          jsx: 'automatic' as const,
+          jsxImportSource: 'js-act',
+        },
+      };
+      if (!deps) return base;
       // Externalize all declared packages so Rollup doesn't try to bundle them
       return {
+        ...base,
         build: {
           rollupOptions: {
             external: Object.keys(deps.packages),

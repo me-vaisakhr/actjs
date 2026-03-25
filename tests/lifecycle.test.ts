@@ -1,5 +1,5 @@
-import { describe, it, expect, afterEach } from 'vitest';
-import { onInit, onMount, onDestroy } from '../src/lifecycle.js';
+import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
+import { onInit, onMount, onDestroy, useInterval, useTimeout } from '../src/lifecycle.js';
 import { setCurrentSetup, createSetupContext } from '../src/context.js';
 
 afterEach(() => {
@@ -54,6 +54,85 @@ describe('lifecycle hooks', () => {
 
     it('throws when called outside setup', () => {
       expect(() => onDestroy(() => {})).toThrow('onDestroy() must be called inside a component setup function.');
+    });
+  });
+
+  describe('useInterval', () => {
+    beforeEach(() => { vi.useFakeTimers(); });
+    afterEach(() => { vi.useRealTimers(); });
+
+    it('registers mount and destroy fns in context', () => {
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      useInterval(() => {}, 1000);
+      expect(ctx.onMountFns).toHaveLength(1);
+      expect(ctx.onDestroyFns).toHaveLength(1);
+    });
+
+    it('starts interval on mount and fires callback', () => {
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      const fn = vi.fn();
+      useInterval(fn, 500);
+      ctx.onMountFns[0]!();
+      vi.advanceTimersByTime(1500);
+      expect(fn).toHaveBeenCalledTimes(3);
+    });
+
+    it('clears interval on destroy', () => {
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      const fn = vi.fn();
+      useInterval(fn, 500);
+      ctx.onMountFns[0]!();
+      vi.advanceTimersByTime(500);
+      ctx.onDestroyFns[0]!();
+      vi.advanceTimersByTime(1000);
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    it('throws when called outside setup', () => {
+      expect(() => useInterval(() => {}, 1000)).toThrow('useInterval() must be called inside a component setup function.');
+    });
+  });
+
+  describe('useTimeout', () => {
+    beforeEach(() => { vi.useFakeTimers(); });
+    afterEach(() => { vi.useRealTimers(); });
+
+    it('registers mount and destroy fns in context', () => {
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      useTimeout(() => {}, 1000);
+      expect(ctx.onMountFns).toHaveLength(1);
+      expect(ctx.onDestroyFns).toHaveLength(1);
+    });
+
+    it('fires callback once after delay', () => {
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      const fn = vi.fn();
+      useTimeout(fn, 300);
+      ctx.onMountFns[0]!();
+      vi.advanceTimersByTime(300);
+      expect(fn).toHaveBeenCalledTimes(1);
+      vi.advanceTimersByTime(1000);
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels timeout on destroy before it fires', () => {
+      const ctx = createSetupContext();
+      setCurrentSetup(ctx);
+      const fn = vi.fn();
+      useTimeout(fn, 500);
+      ctx.onMountFns[0]!();
+      ctx.onDestroyFns[0]!();
+      vi.advanceTimersByTime(1000);
+      expect(fn).not.toHaveBeenCalled();
+    });
+
+    it('throws when called outside setup', () => {
+      expect(() => useTimeout(() => {}, 1000)).toThrow('useTimeout() must be called inside a component setup function.');
     });
   });
 

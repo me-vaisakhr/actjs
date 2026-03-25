@@ -74,7 +74,7 @@ function sharedPackageJson(name: string, binCmd: string, actjsDep?: string): str
     type: 'module',
     scripts: { dev: `${binCmd} dev`, build: `${binCmd} build` },
   };
-  if (actjsDep) pkg['devDependencies'] = { actjs: actjsDep };
+  if (actjsDep) pkg['devDependencies'] = { 'js-act': actjsDep };
   return JSON.stringify(pkg, null, 2) + '\n';
 }
 
@@ -82,7 +82,7 @@ const sharedGitignore = 'node_modules\ndist\n';
 
 function sharedViteConfig(): string {
   return `import { defineConfig } from 'vite';
-import { actjsPlugin } from 'actjs/vite';
+import { actjsPlugin } from 'js-act/vite';
 
 export default defineConfig({
   plugins: [actjsPlugin()],
@@ -90,8 +90,8 @@ export default defineConfig({
 `;
 }
 
-function sharedReadme(name: string): string {
-  return `# ${name}
+function sharedReadme(displayName: string): string {
+  return `# ${displayName}
 
 A project built with [actjs](https://github.com/vaisakhrkrishnan/actjs) — a lightweight, SSR-first frontend framework.
 
@@ -113,14 +113,14 @@ npm run dev
 
 // ─── TypeScript template ──────────────────────────────────────────────────────
 
-export function tsTemplate(name: string, binCmd: string, actjsDep?: string): Record<string, string> {
+export function tsTemplate(name: string, displayName: string, binCmd: string, actjsDep?: string): Record<string, string> {
   return {
     'index.html': `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${name}</title>
+  <title>${displayName}</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -130,7 +130,7 @@ export function tsTemplate(name: string, binCmd: string, actjsDep?: string): Rec
 </html>
 `,
 
-    'src/main.tsx': `import { component, signal, computed, createApp } from 'actjs';
+    'src/main.tsx': `import { component, signal, computed, createApp } from 'js-act';
 
 const App = component(() => {
   const [name, setName]   = signal('');
@@ -149,7 +149,7 @@ const App = component(() => {
 
   return () => (
     <div>
-      <h1>${name}</h1>
+      <h1>${displayName}</h1>
 
       <p class="greeting">{greeting()}</p>
       <input
@@ -178,20 +178,16 @@ createApp('#root').mount(App);
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "actjs",
+    "jsxImportSource": "js-act",
     "strict": true,
-    "skipLibCheck": true,
-    "paths": {
-      "actjs": ["./vendor/actjs/index"],
-      "actjs/jsx-runtime": ["./vendor/actjs/jsx-runtime"]
-    }
+    "skipLibCheck": true
   },
   "include": ["src"]
 }
 `,
 
     'vite.config.ts': sharedViteConfig(),
-    'README.md':      sharedReadme(name),
+    'README.md':      sharedReadme(displayName),
     'style.css':      sharedStyleCss(),
     'package.json':   sharedPackageJson(name, binCmd, actjsDep),
     '.gitignore':     sharedGitignore,
@@ -200,14 +196,14 @@ createApp('#root').mount(App);
 
 // ─── JavaScript template ──────────────────────────────────────────────────────
 
-export function jsTemplate(name: string, binCmd: string, actjsDep?: string): Record<string, string> {
+export function jsTemplate(name: string, displayName: string, binCmd: string, actjsDep?: string): Record<string, string> {
   return {
     'index.html': `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${name}</title>
+  <title>${displayName}</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -217,7 +213,7 @@ export function jsTemplate(name: string, binCmd: string, actjsDep?: string): Rec
 </html>
 `,
 
-    'src/main.jsx': `import { component, signal, computed, createApp } from 'actjs';
+    'src/main.jsx': `import { component, signal, computed, createApp } from 'js-act';
 
 const App = component(() => {
   const [name, setName]   = signal('');
@@ -236,7 +232,7 @@ const App = component(() => {
 
   return () => (
     <div>
-      <h1>${name}</h1>
+      <h1>${displayName}</h1>
 
       <p class="greeting">{greeting()}</p>
       <input
@@ -260,7 +256,7 @@ createApp('#root').mount(App);
 `,
 
     'vite.config.js': sharedViteConfig(),
-    'README.md':      sharedReadme(name),
+    'README.md':      sharedReadme(displayName),
     'style.css':      sharedStyleCss(),
     'package.json':   sharedPackageJson(name, binCmd, actjsDep),
     '.gitignore':     sharedGitignore,

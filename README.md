@@ -64,6 +64,8 @@ npm run dev     # dev server with hot reload → http://localhost:3000
 
 ## Install (existing project)
 
+> **Requires Node.js 20+** — the CLI and dev server use features unavailable in Node 18.
+
 ```bash
 npm install js-act
 ```
@@ -77,6 +79,28 @@ Or via CDN (no build step):
 ---
 
 ## Quick start
+
+### Using Vite directly (alternative to `actjs dev`)
+
+If you prefer Vite as your dev server — or if `actjs dev` isn't working — add `actjsPlugin()` to your config. It wires up the JSX transform automatically:
+
+```bash
+npm install -D vite js-act
+```
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import { actjsPlugin } from 'js-act/vite';
+
+export default defineConfig({
+  plugins: [actjsPlugin()],
+});
+```
+
+Then run `vite` / `vite build` as normal. No extra `jsxImportSource` config needed — the plugin sets it for you.
+
+---
 
 ### With npm + TypeScript (JSX)
 

@@ -7,7 +7,7 @@
  */
 
 import { h, Fragment as ActFragment } from './hyperscript.js';
-import type { Child, Props } from './types.js';
+import type { Child, Props, SVGProps } from './types.js';
 
 export { ActFragment as Fragment };
 
@@ -17,8 +17,32 @@ export { ActFragment as Fragment };
 
 export declare namespace JSX {
   type Element = globalThis.Element | DocumentFragment;
-  // Allow any HTML attribute on any element — actjs passes all props through h()
+
   interface IntrinsicElements {
+    // ── SVG elements — typed presentation & geometry attributes ──────────────
+    svg: SVGProps;
+    path: SVGProps;
+    circle: SVGProps;
+    ellipse: SVGProps;
+    line: SVGProps;
+    polyline: SVGProps;
+    polygon: SVGProps;
+    rect: SVGProps;
+    g: SVGProps;
+    defs: SVGProps;
+    use: SVGProps;
+    symbol: SVGProps;
+    tspan: SVGProps;
+    text: SVGProps;
+    clipPath: SVGProps;
+    mask: SVGProps;
+    pattern: SVGProps;
+    linearGradient: SVGProps;
+    radialGradient: SVGProps;
+    stop: SVGProps;
+    filter: SVGProps;
+    marker: SVGProps;
+    // ── Catch-all for HTML and unknown elements ───────────────────────────────
     [tagName: string]: Props & { children?: Child | Child[] };
   }
 }

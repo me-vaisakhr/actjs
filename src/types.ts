@@ -96,6 +96,67 @@ export interface RouterOptions {
  */
 export type CSSProperties = Record<string, string | number>;
 
+// ─── SVG Props ────────────────────────────────────────────────────────────────
+
+/** Common SVG presentation and geometry attributes.
+ *  Numeric values are accepted where the SVG spec allows them — the runtime
+ *  converts them to strings via setAttribute(key, String(value)).
+ */
+export interface SVGProps {
+  // Geometry
+  x?: string | number;
+  y?: string | number;
+  width?: string | number;
+  height?: string | number;
+  cx?: string | number;
+  cy?: string | number;
+  r?: string | number;
+  rx?: string | number;
+  ry?: string | number;
+  x1?: string | number;
+  y1?: string | number;
+  x2?: string | number;
+  y2?: string | number;
+  d?: string;
+  points?: string;
+  // Presentation
+  fill?: string;
+  'fill-opacity'?: string | number;
+  'fill-rule'?: 'nonzero' | 'evenodd' | 'inherit';
+  stroke?: string;
+  'stroke-width'?: string | number;
+  'stroke-linecap'?: 'butt' | 'round' | 'square' | 'inherit';
+  'stroke-linejoin'?: 'miter' | 'round' | 'bevel' | 'inherit';
+  'stroke-dasharray'?: string | number;
+  'stroke-dashoffset'?: string | number;
+  'stroke-opacity'?: string | number;
+  opacity?: string | number;
+  // Transform & clip
+  transform?: string;
+  'clip-path'?: string;
+  'clip-rule'?: 'nonzero' | 'evenodd' | 'inherit';
+  mask?: string;
+  // Container / metadata
+  viewBox?: string;
+  xmlns?: string;
+  'xmlns:xlink'?: string;
+  preserveAspectRatio?: string;
+  href?: string;
+  'xlink:href'?: string;
+  // Text
+  'font-size'?: string | number;
+  'font-family'?: string;
+  'font-weight'?: string | number;
+  'text-anchor'?: 'start' | 'middle' | 'end' | 'inherit';
+  'dominant-baseline'?: string;
+  // Shared with HTML
+  id?: string;
+  class?: string;
+  style?: CSSProperties | string;
+  children?: Child | Child[];
+  [key: string]: unknown;
+}
+
 /**
  * Typed event handler props for common DOM events.
  * Use when you need strict typing on event handler arguments.

@@ -101,9 +101,22 @@ function resolveActjsSrcRoot(): string {
   return path.join(pkgRoot, 'dist');
 }
 
-function resolveAlias(srcRoot: string, name: string): string {
-  const ts = path.join(srcRoot, `${name}.ts`);
-  return fs.existsSync(ts) ? ts : path.join(srcRoot, `${name}.js`);
+function buildAliases(srcRoot: string): Record<string, string> {
+  const isSource = fs.existsSync(path.join(srcRoot, 'index.ts'));
+  if (isSource) {
+    return {
+      'js-act/jsx-dev-runtime': path.join(srcRoot, 'jsx-runtime.ts'),
+      'js-act/jsx-runtime':     path.join(srcRoot, 'jsx-runtime.ts'),
+      'js-act/server':          path.join(srcRoot, 'hydration.ts'),
+      'js-act':                 path.join(srcRoot, 'index.ts'),
+    };
+  }
+  return {
+    'js-act/jsx-dev-runtime': path.join(srcRoot, 'jsx-runtime.js'),
+    'js-act/jsx-runtime':     path.join(srcRoot, 'jsx-runtime.js'),
+    'js-act/server':          path.join(srcRoot, 'actjs.server.esm.js'),
+    'js-act':                 path.join(srcRoot, 'actjs.esm.js'),
+  };
 }
 
 // ─── Static file copy (skip source/config files) ─────────────────────────────
@@ -180,15 +193,11 @@ export async function runBuild(argv: string[]): Promise<void> {
       format:   'iife',
       platform: 'browser',
       jsx:      'automatic',
-      jsxImportSource: 'actjs',
+      jsxImportSource: 'js-act',
       sourcemap: false,
       minify:   true,
       target:   'es2018',
-      alias: {
-        'actjs/jsx-runtime': resolveAlias(srcRoot, 'jsx-runtime'),
-        'actjs/server':      resolveAlias(srcRoot, 'hydration'),
-        'actjs':             resolveAlias(srcRoot, 'index'),
-      },
+      alias: buildAliases(srcRoot),
       loader: { '.ts': 'ts', '.tsx': 'tsx' },
       absWorkingDir: projectRoot,
     });

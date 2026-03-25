@@ -34,3 +34,31 @@ export function onDestroy(fn: () => void): void {
   const ctx = assertInSetup('onDestroy');
   ctx.onDestroyFns.push(fn);
 }
+
+/**
+ * Starts a repeating interval when the component mounts and clears it
+ * automatically when the component is destroyed. Client-only.
+ *
+ * @example
+ * useInterval(() => setTick(t => t + 1), 1000);
+ */
+export function useInterval(fn: () => void, ms: number): void {
+  const ctx = assertInSetup('useInterval');
+  let id: ReturnType<typeof setInterval>;
+  ctx.onMountFns.push(() => { id = setInterval(fn, ms); });
+  ctx.onDestroyFns.push(() => clearInterval(id));
+}
+
+/**
+ * Schedules a one-shot timeout when the component mounts and cancels it
+ * automatically if the component is destroyed before it fires. Client-only.
+ *
+ * @example
+ * useTimeout(() => setVisible(false), 3000);
+ */
+export function useTimeout(fn: () => void, ms: number): void {
+  const ctx = assertInSetup('useTimeout');
+  let id: ReturnType<typeof setTimeout>;
+  ctx.onMountFns.push(() => { id = setTimeout(fn, ms); });
+  ctx.onDestroyFns.push(() => clearTimeout(id));
+}

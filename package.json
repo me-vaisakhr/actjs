@@ -1,6 +1,6 @@
 {
   "name": "js-act",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Lightweight SSR-first frontend library with fine-grained signals and island architecture",
   "type": "module",
   "main": "./dist/actjs.cjs.js",
@@ -16,6 +16,10 @@
       "require": "./dist/actjs.cjs.js"
     },
     "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
       "types": "./dist/jsx-runtime.d.ts",
       "import": "./dist/jsx-runtime.js"
     },
@@ -39,6 +43,9 @@
   ],
   "unpkg": "./dist/actjs.iife.js",
   "jsdelivr": "./dist/actjs.iife.js",
+  "engines": {
+    "node": ">=20"
+  },
   "sideEffects": false,
   "dependencies": {
     "esbuild": "^0.25.0",
