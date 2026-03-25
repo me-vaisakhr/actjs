@@ -140,6 +140,31 @@ if (argv[0] === 'create') {
 }
 
 // `actjs dev | build | preview [options]`
+
+// ─── Version lock check ───────────────────────────────────────────────────────
+// Refuse to run if the project's installed js-act version doesn't match the CLI.
+// Prevents silent runtime mismatches where the CLI bundles one version of the
+// runtime but the project's node_modules has a different one.
+{
+  const cliPkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
+  const cliVersion = cliPkg.version;
+  const projectPkgPath = join(process.cwd(), 'node_modules', 'js-act', 'package.json');
+
+  if (existsSync(projectPkgPath)) {
+    const projectVersion = JSON.parse(readFileSync(projectPkgPath, 'utf-8')).version;
+    if (projectVersion !== cliVersion) {
+      console.error(
+        `[actjs] Version mismatch — refusing to run.\n\n` +
+        `  CLI version:     ${cliVersion}  (this actjs binary)\n` +
+        `  Project version: ${projectVersion}  (node_modules/js-act)\n\n` +
+        `  Fix: npm install js-act@${cliVersion}\n` +
+        `  Or upgrade the CLI: npm install -g js-act@${projectVersion}\n`
+      );
+      process.exit(1);
+    }
+  }
+}
+
 const distServer = join(__dirname, '..', 'dist', 'dev', 'server.js');
 if (!existsSync(distServer)) {
   console.error('[actjs] Dev server not built yet. Run: npm run build:dev');
