@@ -6,19 +6,79 @@
 
 > Lightweight SSR-first frontend library with fine-grained signals and island architecture.
 
-**Zero runtime dependencies. 8 kB gzipped.**
+**8 kB gzipped. Zero runtime dependencies. Works with a script tag or npm.**
+
+---
+
+## Create a new app
+
+The fastest way to get started — scaffold a project in one command:
+
+```bash
+npx js-act create my-app
+cd my-app
+npm install
+npm run dev        # → http://localhost:3410
+```
+
+TypeScript by default. Add `--template javascript` for plain JS.
+
+```bash
+npm run build      # → dist/index.html (opens without a server)
+```
+
+> Requires Node.js 20+.
+
+---
+
+## Or add to an existing project
+
+```bash
+npm install js-act
+```
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import { actjsPlugin } from 'js-act/vite';
+
+export default defineConfig({
+  plugins: [actjsPlugin()], // wires up JSX transform automatically
+});
+```
+
+```tsx
+// src/main.tsx
+import { component, signal, createApp } from 'js-act';
+
+const Counter = component(() => {
+  const [count, setCount] = signal(0);
+
+  return () => (
+    <div>
+      <p>Count: {count()}</p>
+      <button onclick={() => setCount(c => c + 1)}>+1</button>
+    </div>
+  );
+}, { hydrate: 'interactive' });
+
+createApp('#root').mount(Counter);
+```
+
+---
+
+## Or drop in a script tag (no build step)
 
 ```html
-<!-- Zero build step — drop in and go -->
 <script src="https://cdn.jsdelivr.net/npm/js-act/dist/actjs.iife.js"></script>
 <script>
   const { component, signal, el, createApp } = actjs;
 
   const Counter = component(() => {
     const [count, setCount] = signal(0);
-    return () => el.section(null,
+    return () => el.div(null,
       el.p(null, `Count: ${count()}`),
-      el.button({ onclick: () => setCount(c => c + 1) }, 'Increment'),
+      el.button({ onclick: () => setCount(c => c + 1) }, '+1'),
     );
   }, { hydrate: 'interactive' });
 
@@ -28,257 +88,72 @@
 
 ---
 
-## Features
+## Why js-act?
 
-| Feature | Detail |
-|---|---|
-| **Fine-grained signals** | `signal<T>()` — explicit getter call IS the subscription. No Proxy, no magic. |
-| **Island architecture** | Per-component `hydrate: 'static' | 'interactive' | 'visible'`. Static = zero JS shipped. |
-| **SSR-first** | `renderToString()` + streaming-ready. Works with any server framework. |
-| **`useHead()`** | Reactive `<title>/<meta>/<link>` management. SSR + client. |
-| **`resource()` + `Suspense`** | Async data loading with streaming fallback. |
-| **JSX support** | React 17+ automatic transform via `js-act/jsx-runtime`. |
-| **`el.*` hyperscript** | `el.button(...)` — no-build syntax for script-tag users. |
-| **External packages** | `actjs add lodash` — declare CDN deps in `actjs.deps.json`. Works from npm or jsDelivr/esm.sh/unpkg. |
-| **Zero dependencies** | No `dependencies` in package.json. Ever. |
+| | js-act | React | Vue | Svelte |
+|---|---|---|---|---|
+| Gzipped size | **8 kB** | 45 kB | 34 kB | 10 kB |
+| Runtime deps | **0** | 2 | 1 | 0 |
+| SSR built-in | ✅ | ❌ (needs Next) | ❌ (needs Nuxt) | ❌ (needs SvelteKit) |
+| Script tag | ✅ | ⚠️ | ⚠️ | ❌ |
+| Island hydration | ✅ | ❌ | ❌ | ⚠️ |
 
 ---
 
-## Scaffold a new project
+## Key concepts
 
-```bash
-npx create-actjs-app my-app        # TypeScript (default)
-npx create-actjs-app my-app --template javascript
-
-cd my-app
-npm install
-
-npm run build   # production build → dist/index.html (opens without a server)
-npm run dev     # dev server with hot reload → http://localhost:3000
-```
-
-> **`npm run build` first** — produces a self-contained `dist/index.html` you can open directly.
-> Use `npm run dev` when you need live hot reload during development.
-
----
-
-## Install (existing project)
-
-> **Requires Node.js 20+** — the CLI and dev server use features unavailable in Node 18.
-
-```bash
-npm install js-act
-```
-
-Or via CDN (no build step):
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/js-act/dist/actjs.iife.js"></script>
-```
-
----
-
-## Quick start
-
-### Using Vite directly (alternative to `actjs dev`)
-
-If you prefer Vite as your dev server — or if `actjs dev` isn't working — add `actjsPlugin()` to your config. It wires up the JSX transform automatically:
-
-```bash
-npm install -D vite js-act
-```
+### Signals — explicit, fine-grained reactivity
 
 ```ts
-// vite.config.ts
-import { defineConfig } from 'vite';
-import { actjsPlugin } from 'js-act/vite';
+const [count, setCount] = signal(0);           // read/write pair
+const doubled = computed(() => count() * 2);   // auto-tracks deps
 
-export default defineConfig({
-  plugins: [actjsPlugin()],
-});
+// Reading inside a render fn = auto-subscribe to updates
+return () => <p>{count()} × 2 = {doubled()}</p>;
 ```
 
-Then run `vite` / `vite build` as normal. No extra `jsxImportSource` config needed — the plugin sets it for you.
-
----
-
-### With npm + TypeScript (JSX)
-
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "js-act"
-  }
-}
-```
-
-```tsx
-// counter.tsx
-import { component, signal, computed } from 'js-act';
-import { createApp } from 'js-act';
-
-const Counter = component(() => {
-  const [count, setCount] = signal(0);
-  const doubled = computed(() => count() * 2);
-
-  return () => (
-    <section>
-      <p>{count()} × 2 = {doubled()}</p>
-      <button onclick={() => setCount(c => c + 1)}>Increment</button>
-    </section>
-  );
-}, { hydrate: 'interactive' });
-
-createApp('#root').mount(Counter);
-```
-
-### With Django / Laravel / PHP (IIFE, no build)
-
-```html
-<!-- base.html -->
-<script src="/static/actjs.iife.js" defer></script>
-
-<!-- page.html -->
-<div id="like-button"></div>
-<script>
-  const { component, signal, el, createApp } = actjs;
-
-  const LikeButton = component(() => {
-    const [liked, setLiked] = signal(false);
-    const [count, setCount] = signal({{ post.likes }});
-
-    const toggle = () => {
-      setLiked(l => !l);
-      setCount(c => liked() ? c - 1 : c + 1);
-    };
-
-    return () => el.button(
-      { onclick: toggle, class: liked() ? 'liked' : '' },
-      `${liked() ? '❤️' : '🤍'} ${count()}`
-    );
-  }, { hydrate: 'interactive' });
-
-  createApp('#like-button').mount(LikeButton);
-</script>
-```
-
----
-
-## API
-
-### Signals
+### Components — setup once, render reactively
 
 ```ts
-// Fine-grained signal
-const [count, setCount] = signal(0);
-count();           // read (auto-subscribes in render context)
-setCount(1);       // set directly
-setCount(n => n + 1); // update with function
+const MyComp = component((props) => {
+  // Setup runs ONCE
+  const [name, setName] = signal('');
+  onMount(() => { /* DOM ready */ });
+  onDestroy(() => { /* cleanup */ });
+  useInterval(() => tick(), 1000); // auto-clears on destroy
 
-// Derived signal
-const doubled = computed(() => count() * 2);
-doubled(); // auto-tracks count()
-
-// Global keyed signal (for IIFE users without module scope)
-const [theme, setTheme] = globalSignal('theme', 'light');
-```
-
-### Lifecycle
-
-```ts
-const MyComp = component(() => {
-  onInit(async () => { /* server + client — data loading */ });
-  onMount(() => { /* client only — DOM available */ });
-  onDestroy(() => { /* client only — cleanup */ });
-
-  return () => <div />;
-});
-```
-
-### Component-level timers
-
-`useInterval` and `useTimeout` start on mount and clean up automatically on destroy — no app reference needed.
-
-```ts
-const Clock = component(() => {
-  const [tick, setTick] = signal(0);
-
-  useInterval(() => setTick(t => t + 1), 1000); // repeating — auto-clears on destroy
-  useTimeout(() => setTick(0), 10_000);          // one-shot — auto-cancels on destroy
-
-  return () => <p>Tick: {tick()}</p>;
+  // Render fn re-runs when signals change
+  return () => <input value={name()} onInput={e => setName(e.target.value)} />;
 }, { hydrate: 'interactive' });
 ```
 
-### Head management (SEO)
+### Island hydration — ship zero JS for static content
 
 ```ts
-const Page = component(() => {
-  useHead({
-    title: 'My Page',
-    meta: [{ name: 'description', content: 'Description here' }],
-    link: [{ rel: 'canonical', href: 'https://example.com/page' }],
-  });
-  return () => <main>...</main>;
-});
-```
-
-### Async data + Suspense
-
-```tsx
-const BlogPage = component(() => {
-  const posts = resource(() => fetch('/api/posts').then(r => r.json()));
-
-  return () => (
-    <Suspense fallback={<p>Loading...</p>}>
-      <PostList posts={posts()} />
-    </Suspense>
-  );
-});
-```
-
-### Island hydration strategies
-
-```ts
-// Static (default) — renders to HTML, ships ZERO JS
+// Static (default) — renders to HTML, zero JS sent to browser
 const Header = component(() => () => <header>...</header>);
 
-// Interactive — hydrates on page load
+// Interactive — hydrates immediately
 const Counter = component(() => ..., { hydrate: 'interactive' });
 
-// Visible — hydrates when scrolled into view (best for LCP)
+// Visible — hydrates only when scrolled into view
 const HeavyWidget = component(() => ..., { hydrate: 'visible' });
 ```
 
 ### Router
 
 ```ts
-import { createRouter, navigate, Link, params, query } from 'js-act';
+import { createRouter, navigate, Link, params } from 'js-act';
 
 const App = createRouter([
   { path: '/',           component: Home },
-  { path: '/blog/:slug', component: BlogPost },
+  { path: '/post/:slug', component: Post },
   { path: '*',           component: NotFound },
-], { base: '/app' }); // optional base path
+]);
 
-createApp('#root').mount(App);
-
-// Programmatic navigation
-navigate('/blog/hello-world');
-
-// Reactive route params / query — read inside a component render
-const BlogPost = component(() => () => {
-  const { slug } = params();        // auto-subscribes to route changes
-  const { page } = query();         // ?page=2
-  return <article data-slug={slug}>...</article>;
-});
-
-// Declarative link (no full-page reload)
-Link({ href: '/blog/hello', children: 'Read more' });
-// or in JSX:
-// <Link href="/blog/hello">Read more</Link>
+// Inside a component:
+const { slug } = params(); // reactive — updates on route change
+navigate('/post/hello');
 ```
 
 ### SSR
@@ -287,159 +162,41 @@ Link({ href: '/blog/hello', children: 'Read more' });
 import { renderToString } from 'js-act/server';
 
 const html = await renderToString(MyPage);
-// Returns: <title>...</title><main>...</main>
-```
-
-### App factory
-
-```ts
-const app = createApp('#root', { hydrate: false });
-app.mount(MyComponent);
-
-// Utilities (auto-cleaned on destroy)
-app.criticalCSS('body { margin: 0 }');
-app.criticalStylesheet('/styles.css');
-app.safeSetInterval(fn, 1000);
-app.safeSetTimeout(fn, 500);
-
-app.destroy(); // cleans timers, styles, calls onDestroy
+// → "<title>My Page</title><main>...</main>"
 ```
 
 ---
 
-## External packages
-
-js-act supports two ways to use external packages like lodash, bootstrap, or tailwind.
-
-### Option A — npm install (bundled projects)
-
-Standard npm workflow. Vite handles bundling automatically.
+## CLI
 
 ```bash
-npm install lodash bootstrap
+actjs create <name>          # scaffold a new project
+actjs dev                    # dev server with HMR
+actjs build                  # production build
+actjs preview                # preview the build
+actjs add <pkg>[@version]    # add a CDN dependency
+actjs remove <pkg>           # remove a CDN dependency
 ```
 
-```ts
-import _ from 'lodash'
-import 'bootstrap/dist/css/bootstrap.min.css'
-```
+---
 
-### Option B — CDN (no bundler / IIFE users)
+## Contributing
 
-Declare deps in `actjs.deps.json` — the CLI resolves versions from npm and js-act loads them from CDN.
+Contributions are welcome! Here's how to get started:
 
 ```bash
-actjs add lodash          # resolves latest from npm registry
-actjs add bootstrap@5.3.3 # pinned version
-```
-
-This creates/updates `actjs.deps.json`:
-
-```json
-{
-  "provider": "esm.sh",
-  "packages": {
-    "lodash": "4.17.21",
-    "bootstrap": "5.3.3"
-  }
-}
-```
-
-Supported CDN providers: `"esm.sh"` (default, ESM + tree-shaking), `"jsdelivr"`, `"unpkg"`.
-
-#### With Vite (build-time — recommended)
-
-Add the plugin to your `vite.config.ts`. It reads `actjs.deps.json` and automatically injects an import map + stylesheet links into your HTML and externalizes packages from the bundle.
-
-```ts
-import { actjsPlugin } from 'js-act/vite'
-
-export default defineConfig({
-  plugins: [actjsPlugin()],
-})
-```
-
-Your code then imports packages by name — no URL needed:
-
-```ts
-import _ from 'lodash'  // resolved via the injected import map
-```
-
-#### Runtime loading (IIFE / no bundler)
-
-For script-tag users, call `useDeps()` before mounting your app:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/js-act/dist/actjs.iife.js"></script>
-<script type="module">
-  const { useDeps, createApp, component, signal, el } = actjs;
-
-  await useDeps({
-    provider: 'esm.sh',
-    packages: { lodash: '4.17.21', bootstrap: '5.3.3' }
-  });
-
-  // Bootstrap CSS is injected, lodash is available via import map
-  createApp('#root').mount(MyApp);
-</script>
-```
-
-You can also use the lower-level helpers directly:
-
-```ts
-import { loadScript, loadStylesheet, defineImportMap, preloadResource } from 'js-act';
-
-// Load a stylesheet
-await loadStylesheet('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
-
-// Load a script
-await loadScript('https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js');
-
-// Set up an import map for ESM bare imports
-defineImportMap({ lodash: 'https://esm.sh/lodash@4.17.21' });
-
-// Preload hint for the browser
-preloadResource('https://esm.sh/lodash@4.17.21', 'script');
-```
-
-All helpers are:
-- **SSR-safe** — no-op when `document` is undefined
-- **Idempotent** — the same URL is never injected twice even with concurrent callers
-- **Tree-shakeable** — unused helpers add zero bytes to your bundle
-
----
-
-## Build outputs
-
-| File | Use |
-|---|---|
-| `dist/actjs.esm.js` | ESM — import via npm |
-| `dist/actjs.cjs.js` | CJS — require() in Node.js |
-| `dist/actjs.iife.js` | Script tag — `<script src="...">` |
-| `dist/jsx-runtime.js` | JSX transform (auto-imported by TypeScript) |
-| `dist/actjs.server.esm.js` | SSR — `renderToString()` |
-| `dist/vite-plugin.js` | Vite plugin — `import { actjsPlugin } from 'js-act/vite'` |
-
----
-
-## Examples
-
-- [Counter](examples/counter/index.html) — IIFE build, no tooling
-- [Blog](examples/blog/index.html) — island architecture (static header, interactive like buttons, lazy newsletter)
-- [Todo](examples/todo/index.html) — signals, computed, list rendering
-- [Landing](examples/landing/index.html) — full landing page with components
-
----
-
-## Development
-
-```bash
+git clone https://github.com/me-vaisakhr/actjs.git
+cd js-act
 npm install
-npm test            # run tests
-npm run typecheck   # TypeScript check
-npm run build       # build all formats
-npm run test:coverage  # coverage report
+npm test           # run the test suite
+npm run typecheck  # TypeScript check
+npm run build:all  # build all outputs
 ```
+
+- All source lives in `src/` — one file per module
+- Tests live in `tests/` — one file per source module, 100% coverage enforced
+- Open an issue before starting large changes so we can align on approach
+- PRs should include tests for any new behavior
 
 ---
 
